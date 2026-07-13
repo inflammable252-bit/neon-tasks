@@ -79,7 +79,7 @@ class Note {
 class ChecklistNote extends Note {
     constructor({title, description, dueDate, created, priority, size, position, type}){
         super({title, description, dueDate, priority, size, position})
-        this.type = "Checklist"
+        this.type = type
     }
 }
 class DateNote extends Note {
@@ -101,9 +101,17 @@ class Project {
     }
     addTaskToList(task) {
         let newTask;
-        if (task.type === "Checklist") newTask = new ChecklistNote(task);
-        if (task.type === "DateNote") newTask = new DateNote(task);
-        else newTask = new Note(task)
+        switch (task.type) {
+            case "Note":
+                newTask = new Note(task);
+                break;
+                case "Checklist":
+                newTask = new ChecklistNote(task);
+                break;
+                case "DateNote":
+                newTask = new DateNote(task);
+                break;
+        }
         this.taskList.push(newTask);
     }
 }

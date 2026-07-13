@@ -4,9 +4,11 @@ import "./reset.css"
 import { Element, Image, Project, Note, ChecklistNote, DateNote } from "./components.js"
 import { format, formatDistance, formatISO, parseISO, getHours } from "date-fns"
 
+let autoSpread = true;
 const projectsList = []
 
 const body = document.querySelector("body");
+const cardWrapper = document.getElementById("card-wrapper");
 
 function addProject(projectName) {
     const newProject = new Project(projectName);
@@ -28,13 +30,13 @@ function deleteTask(projectIndex, taskIndex) {
     projectsList[projectIndex].taskList.splice(taskIndex, 1)
 }
 
+
 function addCardsToDesk(projectIndex) {
-    const cardWrapper = document.getElementById("card-wrapper");
     for (const task of projectsList[projectIndex].taskList) {
-        const card = new Element("article", {classes: "card"}).create()
+        const card = new Element("article", {classes: "card"}).create();
         populateCard(task, card);
-        cardWrapper.append(card)
-        task.size = [card.clientWidth, card.clientHeight]
+        cardWrapper.append(card);
+        task.size = [card.clientWidth, card.clientHeight];
         console.log(task)
     }
 }
@@ -47,6 +49,7 @@ function populateCard(task, card) {
     const createdDate = new Element("p", {classes: "card-created", text: creation}).create()
     const dueDate = new Element("p", {classes: "card-due", text: task.dueDate}).create()
     card.append(title, createdDate, description, priority)
+    card.position = "relative"
     if (task.timer) {
         const timerEle = new Element("p", {classes: "card-timer", text: "Time left: " + formatDistance(task.created, task.dueDate)}).create()
         card.append(timerEle)
@@ -61,3 +64,71 @@ addTask(0, {title: "Date Note", description: "A date will be emphasized here wit
 updateTask(0, 0, {title: "1st task new name"})
 
 addCardsToDesk(0)
+
+// Card drag adapted from:
+// https://srivastavayushmaan1347.medium.com/blog-title-creating-a-draggable-div-element-with-javascript-88f3be51bbf9
+
+const cards = document.querySelectorAll(".card");
+const isMobile = window.matchMedia("(pointer: coarse)").matches;
+
+cards.forEach((card) => {
+    let offsetX, offsetY;
+    card.addEventListener("pointerdown", (e) => {
+        offsetX = e.clientX - card.getBoundingClientRect().left;
+        offsetY = e.clientY - card.getBoundingClientRect().top;
+    
+        card.position = [offsetX, offsetY]
+        console.log(card.getBoundingClientRect().left)
+
+        cardWrapper.addEventListener("pointermove", pointerMoveHandler);
+        cardWrapper.addEventListener("pointerup", pointerupHandler)
+        card.style.transition = "";
+    });
+
+    function pointerMoveHandler(e) {
+        card.style.left = e.clientX - offsetX + "px";
+        card.style.top = e.clientY - offsetY + "px";
+        card.style.position = "absolute"
+    }
+    function pointerupHandler() {
+        cardWrapper.removeEventListener("pointermove", pointerMoveHandler);
+        cardWrapper.removeEventListener("pointerup", pointerupHandler)
+        getCardPositions()
+        if (autoSpread) window.addEventListener("resize", adjustCardPositions)
+        card.style.transition = "all 0.4s ease-in-out";
+    }
+})
+function getCardPositions() {
+    cards.forEach((card) => {
+        card.dataset.x = parseInt(card.style.left) / cardWrapper.getBoundingClientRect().width;
+        card.dataset.y = parseInt(card.style.top) / cardWrapper.getBoundingClientRect().height;
+    })
+}
+const debounce = (callback, wait) => {
+  let timeoutId = null;
+
+  return (...args) => {
+    window.clearTimeout(timeoutId);
+
+    timeoutId = window.setTimeout(() => {
+      callback.apply(null, args);
+    }, wait);
+  };
+}
+const adjustCardPositions = debounce((e) => {
+    cards.forEach((card) => {
+        let oldXRatio = card.dataset.x
+        let oldYRatio = card.dataset.y
+        let newX = (oldXRatio * cardWrapper.getBoundingClientRect().width);
+        let newY = (oldYRatio * cardWrapper.getBoundingClientRect().height);
+        if (newX < 0) newX = 0;
+        if (newY < 0) newY = 0;
+        if ((newX + card.clientWidth) >= cardWrapper.getBoundingClientRect().width) newX -= card.clientWidth;
+        if ((newY + card.clientHeight) >= cardWrapper.getBoundingClientRect().height) newY -= card.clientHeight;
+        card.style.left = newX + "px";
+        card.style.top =  newY + "px";
+        console.log("previous x ", oldXRatio)
+        console.log("new x ", newX)
+        console.log("card x ", card.style.left)
+    })
+}, 1000)
