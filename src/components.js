@@ -1,8 +1,9 @@
+import { formatISO } from "date-fns";
 export { Element, Image, Project, Note, ChecklistNote, DateNote }
 
 //  Elements
 class Element {
-    constructor(tag, {id = undefined, classes = "", text = "", event, callback} = {}) {
+    constructor(tag, {id = undefined, classes = "", text = "", event, callback}) {
         this.tag = tag;
         this.id = id;
         this.classes = classes;
@@ -51,13 +52,15 @@ class Image {
 
 // Notes
 class Note {
-    constructor({title, description, dueDate, priority, size, position}) {
+    constructor({title, description, dueDate, created, priority, size, position, type}) {
         this.title = title;
         this.description = description;
         this.priority = priority
         this.dueDate = dueDate;
+        this.created = this.newDate()
         this.size = size;
         this.position = position;
+        this.type = type;
     }
     update({title, description, dueDate, priority, size, position}) {
         if (title) this.title = title;
@@ -67,26 +70,29 @@ class Note {
         if (size) this.size = size;
         if (position) this.position = position;
     }
-
+    newDate() {
+        if (!this.created) {
+            return formatISO(new Date())
+        }
+    }
 }
 class ChecklistNote extends Note {
-    constructor({title, description, dueDate, priority, size, position}){
+    constructor({title, description, dueDate, created, priority, size, position, type}){
         super({title, description, dueDate, priority, size, position})
-
+        this.type = "Checklist"
     }
 }
 class DateNote extends Note {
-    constructor({title, description, dueDate, priority, size, position, timer}){
+    constructor({title, description, dueDate, created, priority, size, position, timer, type}){
         super({title, description, dueDate, priority, size, position})
         this.timer = timer
+        this.type = "DateNote"
     }
     update({title, description, dueDate, priority, size, position, timer}) {
         super.update({title, description, dueDate, priority, size, position})
         if (timer) this.timer = timer;
     }
-    
 }
-
 class Project {
     constructor(name, color = "default") {
         this.name = name
@@ -94,31 +100,17 @@ class Project {
         this.taskList = [];
     }
     addTaskToList(task) {
-        const newTask = new Note(task);
+        let newTask;
+        if (task.type === "Checklist") newTask = new ChecklistNote(task);
+        if (task.type === "DateNote") newTask = new DateNote(task);
+        else newTask = new Note(task)
         this.taskList.push(newTask);
     }
 }
-function addProject(projectName) {
-    const newProject = new Project(projectName);
-    projectsList.push(newProject)
-}
-function addTask(projectIndex, task) {
-    projectsList[projectIndex].addTaskToList(task)
-}
-function updateTask(projectIndex, taskIndex, update) {
-   projectsList[projectIndex].taskList[taskIndex].update(update)
-}
 
-const projectsList = []
-addProject("Your First Project")
-addProject("Your Second Project")
-addTask(0, {title: "1st task", description: "description"})
-addTask(0, {title: "Another task", description: "description 2"})
-updateTask(0, 0, {title: "1st task new name"})
-console.log(projectsList)
 
 /*
-projectsList
+projectsList structure
 [
   Project {
     name: 'Your First Project',
