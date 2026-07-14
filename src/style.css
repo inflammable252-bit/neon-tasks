@@ -2,30 +2,38 @@
     --bg-dusk: url(/src/images/dusk.png);
     --bg-dusk-color: #4888B7;
     --theme-dusk-dark: #202D40;
-    --theme-dusk-color: #0B1443;
+    --theme-dusk-color: #151f53;
     --theme-dusk-op: #202d40c5;
-    --theme-dusk-font: #df8bf8;
+    --theme-dusk-accent: #6bdd97;
+    --theme-dusk-font: #da7cf7;
+    --theme-dusk-font-l: #5cfa99;
 
     --bg-dawn: url(/src/images/dawn.png);
     --bg-dawn-color: #CD90B9;
     --theme-dawn-color: #474476;
     --theme-dawn-dark: #8C4968;
-    --theme-dawn-op: #0b1443a4;
-    --theme-dawn-font: #f3c073;
+    --theme-dawn-op: #0b144394;
+    --theme-dawn-accent: #f79aef;
+    --theme-dawn-font: #fabf68;
+    --theme-dawn-font-l: #ff9ac9;
 
     --bg-night: url(/src/images/night.png);
     --bg-night-color: #1F52B7;
-    --theme-night-color: #1E3E9E;
+    --theme-night-color: #1e3068;
     --theme-night-dark: #0B1443;
-    --theme-night-op: #0b1443a4;
+    --theme-night-op: #0b144386;
+    --theme-night-accent: #e6db7d;
     --theme-night-font: #ffa047;
+    --theme-night-font-l: #ffe23d;
 
     --bg-current: var(--bg-dawn);
     --bg-current-color: var(--bg-dawn-color);
     --theme-current-dark: var(--theme-dawn-dark);
     --theme-current-color: var(--theme-dawn-color);
     --theme-current-op: var(--theme-dawn-op);
-    --theme-current-font: var(--theme-dawn-font)
+    --theme-current-accent: var(--theme-dawn-accent);
+    --theme-current-font: var(--theme-dawn-font);
+    --theme-current-font-l: var(--theme-dawn-font-l)
 }
 
 body {
@@ -46,12 +54,13 @@ header {
     justify-content: space-between;
     z-index: 10;
     background-color: var(--theme-current-color);
+    padding: 0.5vw 2vw;
+    align-items: center;
     h1 {
         font-size: calc(2em + 1vw);
         text-shadow:
             0 0 0.3em var(--theme-current-font),
             0 0 0.1em #ffffffcc;
-        padding: 0.5vw 2vw;
     }
 }
 div#header-right {
@@ -81,23 +90,89 @@ nav {
     grid-row: 3/4;
     grid-column: 2/-1;
     height: 1rem;
+    background-color: var(--theme-current-color);
 }
 main section#card-wrapper {
-    min-height: 100vh;
+    height: 100dvh;
     /* width: 100%; */
     position: relative;
     border-radius: 12px;
     background-color: var(--theme-current-op);
-    margin: calc(1rem + 1.5vw);
+    margin: calc(1rem + 1vw);
 }
 .card {
-    height: 225px;
-    width: 175px;
-    border-radius: 4px;
+    --pad: 0.1em 0.3em;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
+    height: 250px;
+    width: 225px;
+    border-radius: 6px;
     z-index: 5;
     user-select: none;
-    overflow: hidden;
     touch-action: none;
-    background-color: var(--theme-current-color);
+    background-color: var(--theme-current-op);
     color: white;
+    border: 4px double var(--theme-current-accent);
+    padding: 0.5rem 0.7rem;
+    box-shadow: 
+        0 0 0.2em #ffffff96,
+        0 0 1em #ffffff83;
+    backdrop-filter: blur(4px);
+    scrollbar-width: thin;
+    scrollbar-color: var(--theme-current-accent) var(--theme-current-color);
+
+    h4.card-header {
+        font-size: 1.2em;
+        line-height: 1.1;
+    }
+    p.card-created {
+        font-size: 0.8em;
+        color: #ffffff98;
+    }
+    p.card-text {
+        background-color: #ffffff10;
+        text-overflow: ellipsis;
+        border-radius: 4px;
+        padding: var(--pad);
+        flex: 1;
+        overflow: auto;
+    }
+    div.card-time-section {
+        background-color: #00000023;
+        border-radius: 0 0 4px 4px;
+    }
+    p.card-deadline-head {
+        background-color: #00000017;
+    }
+    p.card-due {
+        background-color: #0000001a;
+    }
+    p.card-priority {
+    }
+    p.card-timer {
+    }
+}
+.card.datenote {
+    overflow: auto;
+    div.card-time-section {
+        text-align: center;
+    }
+    p.card-due {
+        font-size: 1.5em;
+        color: var(--theme-current-font-l);
+        font-weight: bold;
+    }
+    p.card-due-time {
+        font-size: 1.4em;
+        font-weight: bold;
+        background-color: #00000017;
+    }
+    p.card-timer {
+    }
+    p.card-text {
+        flex-shrink: 1;
+        overflow: visible;
+    }
 }

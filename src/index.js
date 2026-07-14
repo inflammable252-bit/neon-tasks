@@ -5,6 +5,7 @@ import { Element, Image, Project, Note, ChecklistNote, DateNote } from "./compon
 import { format, formatDistance, formatISO, parseISO, getHours } from "date-fns"
 
 let autoSpread = true;
+let mode = "dawn"
 const projectsList = []
 
 const body = document.querySelector("body");
@@ -33,7 +34,7 @@ function deleteTask(projectIndex, taskIndex) {
 
 function addCardsToDesk(projectIndex) {
     for (const task of projectsList[projectIndex].taskList) {
-        const card = new Element("article", {classes: "card"}).create();
+        const card = new Element("article", {classes: `card ${task.type.toLowerCase()}`}).create();
         populateCard(task, card);
         cardWrapper.append(card);
         task.size = [card.clientWidth, card.clientHeight];
@@ -43,24 +44,52 @@ function addCardsToDesk(projectIndex) {
 function populateCard(task, card) {
     const title = new Element("h4", {classes: "card-header", text: task.title}).create()
     const description = new Element("p", {classes: "card-text", text: task.description}).create()
-    const priority = new Element("p", {classes: "card-priority", text: task.priority}).create()
-
-    const creation = formatISO(task.created, {representation: "date"}) + ", " + (formatISO(task.created, {representation: "time"})).slice(0,5)
+    
+    const creation = format(task.created, "MM/dd/yyyy")
     const createdDate = new Element("p", {classes: "card-created", text: creation}).create()
-    const dueDate = new Element("p", {classes: "card-due", text: task.dueDate}).create()
-    card.append(title, createdDate, description, priority)
-    card.position = "relative"
+    card.position = "relative";
+    
+    if (task.type === "DateNote") {
+        card.append(title, createdDate, createCardTimeDiv(task,card), description);
+        return
+    }
+    else card.append(title, createdDate, description, createCardTimeDiv(task, card));
+}
+function createCardTimeDiv(task, card) {
+    const timeSection = new Element("div", {classes: "card-time-section"}).create();
+
+    const deadlineHead = new Element("p", {classes: "card-deadline-head", text: "Deadline: "}).create()
+    if (task.dueDate) {
+        if (task.type === "DateNote") {
+            const dueDate = format(task.dueDate, "MM/dd/yyyy");
+            const dueTime = format(task.dueDate, "hh:dd aaa");
+            const dueDateEle = new Element("p", {classes: "card-due", text: dueDate}).create()
+            const dueTimeEle = new Element("p", {classes: "card-due-time", text: dueTime}).create()
+            timeSection.append(dueDateEle, dueTimeEle)
+        }
+        else {
+            
+            const dueDate = (format(task.dueDate, 'MM/dd/yyyy')) + ", " + (format(task.dueDate, "hh:dd aaa"));
+            const dueDateEle = new Element("p", {classes: "card-due", text: dueDate}).create();
+            timeSection.append(deadlineHead, dueDateEle)
+        }
+    }
+    if (task.priority) {
+        const priority = new Element("p", {classes: "card-priority", text: "Priority: " + task.priority}).create();
+        timeSection.append(priority)
+    }
     if (task.timer) {
         const timerEle = new Element("p", {classes: "card-timer", text: "Time left: " + formatDistance(task.created, task.dueDate)}).create()
-        card.append(timerEle)
+        timeSection.append(timerEle)
     }
+    return timeSection;
 }
 
 addProject("Your First Project")
 addProject("Your Second Project")
 addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "Note"})
 addTask(0, {title: "Checklist", description: "Checklist items go here.", dueDate: "2026-08-10T22:21:30-07:00", type: "Checklist"})
-addTask(0, {title: "Date Note", description: "A date will be emphasized here with a description and an optional timer.", type: "DateNote", dueDate: "2026-07-15T22:21:30-07:00", timer: true})
+addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "DateNote", dueDate: "2026-07-15T22:21:30-07:00", timer: true})
 updateTask(0, 0, {title: "1st task new name"})
 
 addCardsToDesk(0)
@@ -150,15 +179,21 @@ function changeTheme(theme) {
     let newDark = `--theme-${theme}-dark`;
     let newColor =  `--theme-${theme}-color`;
     let newOp = `--theme-${theme}-op`;
+    let newAccent = `--theme-${theme}-accent`;
     let newFont = `--theme-${theme}-font`
+    let newFontL = `--theme-${theme}-font-l`
     root.style.setProperty("--bg-current", `var(${newBg})`);
     root.style.setProperty("--bg-current-color", `var(${newBgColor})`);
     root.style.setProperty("--theme-current-dark", `var(${newDark})`);
     root.style.setProperty("--theme-current-color", `var(${newColor}`);
     root.style.setProperty("--theme-current-op", `var(${newOp})`);
+    root.style.setProperty("--theme-current-accent", `var(${newAccent})`);
     root.style.setProperty("--theme-current-font", `var(${newFont})`);
+    root.style.setProperty("--theme-current-font-l", `var(${newFontL})`);
 }
 const modeSelect = document.getElementById("mode-select")
 modeSelect.addEventListener("change", (e) => {
     changeTheme(e.target.value)
+    mode = e.target.value;
+    console.log(mode)
 })
