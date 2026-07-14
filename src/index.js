@@ -94,7 +94,7 @@ cards.forEach((card) => {
         cardWrapper.removeEventListener("pointermove", pointerMoveHandler);
         cardWrapper.removeEventListener("pointerup", pointerupHandler)
         getCardPositions()
-        if (autoSpread) window.addEventListener("resize", adjustCardPositions)
+        if (autoSpread) window.addEventListener("resize", throttle(adjustCardPositions), 1000)
         card.style.transition = "all 0.4s ease-in-out";
     }
 })
@@ -106,14 +106,24 @@ function getCardPositions() {
 }
 const debounce = (callback, wait) => {
   let timeoutId = null;
-
   return (...args) => {
     window.clearTimeout(timeoutId);
-
     timeoutId = window.setTimeout(() => {
       callback.apply(null, args);
     }, wait);
   };
+}
+function throttle(fn, delay) {
+    let isThr = false;
+    return function (...args) {
+        if (!isThr) {
+            fn.apply(this, args);
+            isThr = true;
+            setTimeout(() => {
+                isThr = false;
+            }, delay);
+        }
+    };
 }
 const adjustCardPositions = debounce((e) => {
     cards.forEach((card) => {
@@ -123,8 +133,8 @@ const adjustCardPositions = debounce((e) => {
         let newY = (oldYRatio * cardWrapper.getBoundingClientRect().height);
         if (newX < 0) newX = 0;
         if (newY < 0) newY = 0;
-        if ((newX + card.clientWidth) >= cardWrapper.getBoundingClientRect().width) newX -= card.clientWidth;
-        if ((newY + card.clientHeight) >= cardWrapper.getBoundingClientRect().height) newY -= card.clientHeight;
+        if ((newX + card.clientWidth) >= cardWrapper.getBoundingClientRect().width) newX -= card.clientWidth / 2;
+        if ((newY + card.clientHeight) >= cardWrapper.getBoundingClientRect().height) newY -= card.clientHeight / 2;
         card.style.left = newX + "px";
         card.style.top =  newY + "px";
         console.log("previous x ", oldXRatio)
@@ -132,3 +142,23 @@ const adjustCardPositions = debounce((e) => {
         console.log("card x ", card.style.left)
     })
 }, 1000)
+
+function changeTheme(theme) {
+    const root = document.documentElement;
+    let newBg = `--bg-${theme}`;
+    let newBgColor = `--bg-${theme}-color`;
+    let newDark = `--theme-${theme}-dark`;
+    let newColor =  `--theme-${theme}-color`;
+    let newOp = `--theme-${theme}-op`;
+    let newFont = `--theme-${theme}-font`
+    root.style.setProperty("--bg-current", `var(${newBg})`);
+    root.style.setProperty("--bg-current-color", `var(${newBgColor})`);
+    root.style.setProperty("--theme-current-dark", `var(${newDark})`);
+    root.style.setProperty("--theme-current-color", `var(${newColor}`);
+    root.style.setProperty("--theme-current-op", `var(${newOp})`);
+    root.style.setProperty("--theme-current-font", `var(${newFont})`);
+}
+const modeSelect = document.getElementById("mode-select")
+modeSelect.addEventListener("change", (e) => {
+    changeTheme(e.target.value)
+})

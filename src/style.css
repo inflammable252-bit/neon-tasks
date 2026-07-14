@@ -1,13 +1,43 @@
 :root {
+    --bg-dusk: url(/src/images/dusk.png);
+    --bg-dusk-color: #4888B7;
+    --theme-dusk-dark: #202D40;
+    --theme-dusk-color: #0B1443;
+    --theme-dusk-op: #202d40c5;
+    --theme-dusk-font: #df8bf8;
 
+    --bg-dawn: url(/src/images/dawn.png);
+    --bg-dawn-color: #CD90B9;
+    --theme-dawn-color: #474476;
+    --theme-dawn-dark: #8C4968;
+    --theme-dawn-op: #0b1443a4;
+    --theme-dawn-font: #f3c073;
+
+    --bg-night: url(/src/images/night.png);
+    --bg-night-color: #1F52B7;
+    --theme-night-color: #1E3E9E;
+    --theme-night-dark: #0B1443;
+    --theme-night-op: #0b1443a4;
+    --theme-night-font: #ffa047;
+
+    --bg-current: var(--bg-dawn);
+    --bg-current-color: var(--bg-dawn-color);
+    --theme-current-dark: var(--theme-dawn-dark);
+    --theme-current-color: var(--theme-dawn-color);
+    --theme-current-op: var(--theme-dawn-op);
+    --theme-current-font: var(--theme-dawn-font)
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    min-height: 100%;
+    min-height: 100dvh;
     display: grid;
     grid-template-rows: auto 1fr auto;
     grid-template-columns: auto 1fr;
+    background-color: var(--bg-current-color);
+}
+h1, h2, h3, h4 {
+    color: var(--theme-current-font);
 }
 header {
     grid-row: 1/2;
@@ -15,38 +45,59 @@ header {
     display: flex;
     justify-content: space-between;
     z-index: 10;
-    background-color: #FFF;
+    background-color: var(--theme-current-color);
+    h1 {
+        font-size: calc(2em + 1vw);
+        text-shadow:
+            0 0 0.3em var(--theme-current-font),
+            0 0 0.1em #ffffffcc;
+        padding: 0.5vw 2vw;
+    }
 }
-div#username-header {
+div#header-right {
+    display: flex;
     text-align: end;
+}
+div#header-right select {
+    height: min-content;
+    background-color: var(--theme-current-op);
+    color: #FFF;
+    border-radius: 6px;
+    padding: 0.1rem;
 }
 aside#sidebar {
     grid-row: 1/-1;
     grid-column: 1/2;
 }
 main {
-    background-color: rgba(128, 0, 128, 0.589);
     grid-row: 2/3;
     grid-column: 2/3;
+    background-image: var(--bg-current);
+    background-repeat: repeat-x;
+    background-position: bottom;
+    transition: background-image 0.3s ease-in-out
 }
 nav {
-    background-color: rgb(77, 43, 62);
     grid-row: 3/4;
     grid-column: 2/-1;
     height: 1rem;
 }
 main section#card-wrapper {
     min-height: 100vh;
-    width: 100%;
+    /* width: 100%; */
     position: relative;
+    border-radius: 12px;
+    background-color: var(--theme-current-op);
+    margin: calc(1rem + 1.5vw);
 }
 .card {
-    height: 200px;
-    width: 155px;
-    border: 1px solid black;
+    height: 225px;
+    width: 175px;
     border-radius: 4px;
     z-index: 5;
     user-select: none;
     overflow: hidden;
     touch-action: none;
+    background-color: var(--theme-current-color);
+    color: white;
 }
