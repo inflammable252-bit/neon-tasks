@@ -1,13 +1,4 @@
 :root {
-    --bg-dusk: url(/src/images/dusk.png);
-    --bg-dusk-color: #4888B7;
-    --theme-dusk-dark: #202D40;
-    --theme-dusk-color: #151f53;
-    --theme-dusk-op: #202d40c5;
-    --theme-dusk-accent: #6bdd97;
-    --theme-dusk-font: #da7cf7;
-    --theme-dusk-font-l: #5cfa99;
-
     --bg-dawn: url(/src/images/dawn.png);
     --bg-dawn-color: #CD90B9;
     --theme-dawn-color: #474476;
@@ -15,7 +6,16 @@
     --theme-dawn-op: #0b144394;
     --theme-dawn-accent: #f79aef;
     --theme-dawn-font: #fabf68;
-    --theme-dawn-font-l: #ff9ac9;
+    --theme-dawn-font-l: #fa9fca;
+
+    --bg-dusk: url(/src/images/dusk.png);
+    --bg-dusk-color: #4888B7;
+    --theme-dusk-dark: #202D40;
+    --theme-dusk-color: #151f53;
+    --theme-dusk-op: #202d40c5;
+    --theme-dusk-accent: #7efaad;
+    --theme-dusk-font: #da7cf7;
+    --theme-dusk-font-l: #3afd85;
 
     --bg-night: url(/src/images/night.png);
     --bg-night-color: #1F52B7;
@@ -24,7 +24,7 @@
     --theme-night-op: #0b144386;
     --theme-night-accent: #e6db7d;
     --theme-night-font: #ffa047;
-    --theme-night-font-l: #ffe23d;
+    --theme-night-font-l: #fddf7e;
 
     --bg-current: var(--bg-dawn);
     --bg-current-color: var(--bg-dawn-color);
@@ -33,21 +33,46 @@
     --theme-current-op: var(--theme-dawn-op);
     --theme-current-accent: var(--theme-dawn-accent);
     --theme-current-font: var(--theme-dawn-font);
-    --theme-current-font-l: var(--theme-dawn-font-l)
+    --theme-current-font-l: var(--theme-dawn-font-l);
+
+    --p-normal: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --p-strong: 'Electrolize', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --h: 'Smooch Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+@font-face {
+    font-family: 'Electrolize';
+    src: url('./fonts/Electrolize-Regular.woff2') format('woff2'),
+        url('./fonts/Electrolize-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Smooch Sans';
+    src: url('./fonts/SmoochSans-Thin.woff2') format('woff2'),
+        url('./fonts/SmoochSans-Thin.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: var(--p-normal);
     min-height: 100dvh;
     display: grid;
     grid-template-rows: auto 1fr auto;
     grid-template-columns: auto 1fr;
     background-color: var(--bg-current-color);
 }
-h1, h2, h3, h4 {
+h2, h3, h4 {
     color: var(--theme-current-font);
+    font-family: var(--p-strong);
+    text-shadow: 0 0 0.1em var(--theme-current-font-l);
 }
 header {
+    
     grid-row: 1/2;
     grid-column: 1/-1;
     display: flex;
@@ -57,10 +82,14 @@ header {
     padding: 0.5vw 2vw;
     align-items: center;
     h1 {
-        font-size: calc(2em + 1vw);
+        font-weight: bold;
+        letter-spacing: 0.1em;
+        font-family: var(--h);
+        color: var(--theme-current-font);
+        font-size: calc(2.1em + 1vw);
         text-shadow:
-            0 0 0.3em var(--theme-current-font),
-            0 0 0.1em #ffffffcc;
+            0 0 0.1em var(--theme-current-font),
+            0 0 0.05em #ffffffcc;
     }
 }
 div#header-right {
@@ -163,10 +192,14 @@ main section#card-wrapper {
         font-size: 1.5em;
         color: var(--theme-current-font-l);
         font-weight: bold;
+        letter-spacing: 0.05em;
+        text-shadow: 0 0 0.15em var(--theme-current-font);
     }
     p.card-due-time {
         font-size: 1.4em;
-        font-weight: bold;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        color: var(--theme-current-font-l);
         background-color: #00000017;
     }
     p.card-timer {
