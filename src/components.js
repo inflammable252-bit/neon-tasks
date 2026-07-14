@@ -1,5 +1,5 @@
 import { formatISO } from "date-fns";
-export { Element, Image, Project, Note, ChecklistNote, DateNote }
+export { Element, Image, Project, Note, ChecklistNote, DateNote, debounce, throttle }
 
 //  Elements
 class Element {
@@ -116,7 +116,6 @@ class Project {
     }
 }
 
-
 /*
 projectsList structure
 [
@@ -132,3 +131,26 @@ projectsList structure
   }
 ]
 */
+
+const debounce = (callback, wait) => {
+  let timeoutId = null;
+  return (...args) => {
+    window.clearTimeout(timeoutId);
+    timeoutId = window.setTimeout(() => {
+      callback.apply(null, args);
+    }, wait);
+  };
+}
+
+function throttle(fn, delay) {
+    let isThr = false;
+    return function (...args) {
+        if (!isThr) {
+            fn.apply(this, args);
+            isThr = true;
+            setTimeout(() => {
+                isThr = false;
+            }, delay);
+        }
+    };
+}
