@@ -69,18 +69,21 @@ body {
 h2, h3, h4 {
     color: var(--theme-current-font);
     font-family: var(--p-strong);
+    letter-spacing: 0.05em;
     text-shadow: 0 0 0.1em var(--theme-current-font-l);
 }
 header {
-    
     grid-row: 1/2;
     grid-column: 1/-1;
     display: flex;
     justify-content: space-between;
     z-index: 10;
     background-color: var(--theme-current-color);
-    padding: 0.5vw 2vw;
+    padding: 0.5vw 2vw 0;
     align-items: center;
+    box-shadow:
+        0 0.5vw color-mix(in srgb, var(--theme-current-color), #ffffff00 25%),
+        0 1vw color-mix(in srgb, var(--theme-current-color), #ffffff00 40%);
     h1 {
         font-weight: bold;
         letter-spacing: 0.1em;
@@ -113,7 +116,7 @@ main {
     background-image: var(--bg-current);
     background-repeat: repeat-x;
     background-position: bottom;
-    transition: background-image 0.3s ease-in-out
+    transition: background-image 0.3s ease-in-out;
 }
 nav {
     grid-row: 3/4;
@@ -122,8 +125,9 @@ nav {
     background-color: var(--theme-current-color);
 }
 main section#card-wrapper {
+    display: flex;
+    flex-direction: column;
     height: 100dvh;
-    /* width: 100%; */
     position: relative;
     border-radius: 12px;
     background-color: var(--theme-current-op);
