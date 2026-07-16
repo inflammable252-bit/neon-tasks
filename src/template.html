@@ -9,6 +9,10 @@
     <header>
         <h1>NEON TASKS</h1>
         <div id ="header-right">
+                <div id="input-wrapper">
+                    <label for="drag">Drag</label>
+                    <input id="drag" class="toggle" type="checkbox" checked>
+                </div>
                 <select name="mode-select" id="mode-select">
                     <option value="dawn">Dawn</option>
                     <option value="dusk">Dusk</option>
@@ -16,10 +20,29 @@
                 </select>
         </div>
     </header>
-    <aside id ="sidebar"></aside>
+    <aside id ="sidebar">
+        <details id="projects-list" open>
+            <summary>Projects</summary>
+            <ul>
+            </ul>
+        </details>
+        <details id="tasks-list" open>
+            <summary>Tasks</summary>
+            <ul>
+                <li class="task"></li>
+            </ul>
+        </details>
+    </aside>
     <main>
         <section id="card-wrapper"></section>
     </main>
-    <nav></nav>
+    <nav>
+        <div class="menu-buttons-wrapper">
+            <img id="list-icon" class="menu-buttons" src="./images/list-ul-svgrepo-com.svg"/>
+            <img id="add-icon" class="menu-buttons" src="./images/add-square-svgrepo-com.svg"/>
+            <img id="settings-icon" class="menu-buttons" src="./images/settings-svgrepo-com.svg"/>
+        </div>
+    </nav>
+    <dialog id="modal-window" popover><img id="close-modal" src="./images/close-svgrepo-com.svg" alt="Close icon"></dialog>
 </body>
 </html>

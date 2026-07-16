@@ -1,5 +1,6 @@
 // Card builder functions
 export { populateCard, addDrag }
+import { drag } from "./index.js";
 import { Element, Image, Project, Note, ChecklistNote, DateNote, debounce, throttle } from "./components.js";
 import { format, formatDistance, formatISO, parseISO, getHours } from "date-fns";
 
@@ -51,15 +52,24 @@ function createCardTimeDiv(task, card) {
 
 function addDrag(container, autoSpread) {
 const cards = document.querySelectorAll(".card");
-    cards.forEach((card) => {
-        let offsetX, offsetY;
-        card.addEventListener("pointerdown", (e) => {
-            offsetX = e.clientX - card.getBoundingClientRect().left;
+const sidebar = document.getElementById("sidebar")
+const nav =  document.querySelector("nav");
+const header = document.querySelector("header");
+cards.forEach((card) => {
+    let offsetX, offsetY;
+    card.addEventListener("pointerdown", (e) => {
+            console.log(drag)
+            if (!drag) return;
+            let sidebarOffsetX = (sidebar.getBoundingClientRect().right) || 0;
+            let navOffsetY = nav.getBoundingClientRect().top;
+            let headerOffsetY = nav.getBoundingClientRect().bottom;
+            offsetX = e.clientX - card.getBoundingClientRect().left + sidebarOffsetX;
             offsetY = e.clientY - card.getBoundingClientRect().top;
             card.position = [offsetX, offsetY]
             container.addEventListener("pointermove", pointerMoveHandler);
             container.addEventListener("pointerup", pointerupHandler)
             card.style.transition = "";
+            console.log(offsetY)
         });
 
         function pointerMoveHandler(e) {
@@ -71,7 +81,7 @@ const cards = document.querySelectorAll(".card");
             container.removeEventListener("pointermove", pointerMoveHandler);
             container.removeEventListener("pointerup", pointerupHandler)
             getCardPositions()
-            if (autoSpread) window.addEventListener("resize", throttle(adjustCardPositions), 1000)
+            if (autoSpread) window.addEventListener("resize", debounce(adjustCardPositions, 2000))
             card.style.transition = "all 0.4s ease-in-out";
         }
     })
@@ -82,7 +92,8 @@ const cards = document.querySelectorAll(".card");
         })
     }
 
-    const adjustCardPositions = debounce((e) => {
+    const adjustCardPositions = () => {
+        console.log("Running: ", Date().now)
         cards.forEach((card) => {
             let oldXRatio = card.dataset.x
             let oldYRatio = card.dataset.y
@@ -95,5 +106,5 @@ const cards = document.querySelectorAll(".card");
             card.style.left = newX + "px";
             card.style.top =  newY + "px";
         })
-    }, 1000)
+    }
 }

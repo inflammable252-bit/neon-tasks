@@ -1,16 +1,13 @@
 import { formatISO } from "date-fns";
-export { Element, Image, Project, Note, ChecklistNote, DateNote, debounce, throttle }
+export { Element, Image, Input, Project, Note, ChecklistNote, DateNote, debounce, throttle }
 
 //  Elements
 class Element {
-    constructor(tag, {id = undefined, classes = "", text = "", event, callback}) {
+    constructor(tag, {id, classes, text} = {}) {
         this.tag = tag;
         this.id = id;
         this.classes = classes;
         this.text = text;
-        this.event = event;
-        this.callback = callback;
-        this.element;
     }
     create() {
         const element = document.createElement(this.tag);
@@ -18,35 +15,58 @@ class Element {
         this.update(this)
         return this.element;
     }
-    update({id, classes, text, event, callback}) {
+    update({id, classes, text}) {
         if (id) this.element.id = id;
         if (classes) this.element.className = classes;
         if (text) this.element.textContent = text;
-        if (event) {
-            this.element.addEventListener(this.event, () => this.callback())
-        }
     }
-    delete() {
-        this.element.remove()
+
+}
+
+class Input extends Element {
+    constructor({id, classes, text, type, name, required, placeholder, minlength} = {}) {
+        super({id, classes, text})
+        this.tag = "input";
+        this.type = type;
+        this.name = name;
+        this.required = required;
+        this.placeholder = placeholder;
+        this.minlength = minlength;
+        this.element;
+    }
+    update({id, classes, text, type, name, required, placeholder, minlength}={}) {
+        super.update({id, classes, text})
+        if (type) this.element.type = type;
+        if (name) this.element.name = name;
+        if (required===true) this.element.setAttribute("required", "");
+        if (placeholder) this.element.placeholder = placeholder;
+        if (minlength) this.element.minlength;
     }
 }
-class Image {
-    constructor({src, alt, srcsets = ["400w", "800w"], sizes = "(width <= 800px) 400px, 800px"}) {
-        if (src) this.src = src;
-        if (alt) this.alt = alt;
-        if (srcsets) this.srcset = srcsets;
-        if (sizes) this.sizes = sizes;
+
+class Image  {
+    constructor({id, classes, src, alt, srcsets, sizes}) {
+        this.id = id;
+        this.classes = classes;
+        this.src = src;
+        this.alt = alt;
+        this.srcset = srcsets; // ["400w", "800w"]
+        this.sizes = sizes; // (width <= 800px) 400px, 800px"
+        this.img;
     }
     create() {
         const img = document.createElement("img");
-        this.update()
-        return img;
+        this.img = img;
+        this.update(this);
+        return this.img
     }
-    update({src, alt, srcsets, sizes}) {
-        if (src) this.src = src;
-        if (alt) this.alt = alt;
-        if (srcsets) this.srcset = srcsets;
-        if (sizes) this.sizes = sizes;
+    update({id, classes, src, alt, srcsets, sizes}) {
+        if (id) this.img.id = id;
+        if (classes) this.img.classes = classes;
+        if (src) this.img.src = src;
+        if (alt) this.img.alt = alt;
+        if (srcsets) this.img.srcset = srcsets;
+        if (sizes) this.img.sizes = sizes;
     }
 }
 
@@ -113,6 +133,9 @@ class Project {
                 break;
         }
         this.taskList.push(newTask);
+    }
+    getTasks() {
+        return this.taskList
     }
 }
 
