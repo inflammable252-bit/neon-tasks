@@ -20,7 +20,9 @@ class Element {
         if (classes) this.element.className = classes;
         if (text) this.element.textContent = text;
     }
-
+    delete() {
+        this.element.remove()
+    }
 }
 
 class Input extends Element {

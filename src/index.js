@@ -31,10 +31,13 @@ function updateProjectList() {
     const list = document.querySelector("#projects-list ul");
     projectsList.forEach((item) => {
         // console.log("item: ", item)
-        const project = new Element("li", {classes: "project-item", text: item.name}).create();
+        const projectObj = new Element("li", {classes: "project-item", text: item.name})
+        const project = projectObj.create();
         list.append(project)
     })
-    list.append(new Element("button", {id: "create-project", text: "Create Project", event: "click", callback: (e) => {console.log("clicked")}}).create())
+    const buttonObj = new Element("button", {id: "create-project", text: "Create Project"})
+    const button = buttonObj.create();
+    list.append(button)
 }
 
 function updateTaskList() {
@@ -42,10 +45,12 @@ function updateTaskList() {
     const activeProject = projectsList[currentProjectIndex];
     const activeTasks = activeProject.getTasks();
     activeTasks.forEach((item) => {
-        const task = new Element("li", {classes: "task-item", text: item.title}).create();
+        const taskObj = new Element("li", {classes: "task-item", text: item.title});
+        const task = taskObj.create()
         list.append(task)
     })
-    const button = new Element("button", {id: "create-task", text: "Create Task"}).create();
+    const buttonObj = new Element("button", {id: "create-task", text: "Create Task"});
+    const button = buttonObj.create();
     button.addEventListener("click", (e) => displayModal(e))
     list.append(button)
 }
@@ -57,11 +62,14 @@ function displayModal(e) {
     if (e.target.id === "create-task") displayTaskForm()
 }
 function displayTaskForm() {
-    const form = new Element("form", {id: "task-form"}).create();
+    const formObj = new Element("form", {id: "task-form"});
+    const form = formObj.create();
     form.method = "dialog";
-    const inputWrapper = new Element("div", {classes: "input-wrapper"}).create()
+    const inputWrapperObj = new Element("div", {classes: "input-wrapper"})
+    const inputWrapper = inputWrapperObj.create()
     const titleObj = new Input({id: "test", classes: "test", required: true});
-    inputWrapper.append(titleObj.create())
+    const title = titleObj.create();
+    inputWrapper.append(title)
     
     form.append(inputWrapper)
     modalWindow.append(form)
