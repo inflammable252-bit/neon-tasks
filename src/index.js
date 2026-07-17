@@ -3,7 +3,7 @@ import "./reset.css"
 
 export { drag }
 import { populateCard, addDrag } from "./cards.js";
-import { Element, Image, Input, Project, Note, ChecklistNote, DateNote } from "./components.js";
+import { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote } from "./components.js";
 
 let autoSpread = true;
 let drag = true;
@@ -31,11 +31,11 @@ function updateProjectList() {
     const list = document.querySelector("#projects-list ul");
     projectsList.forEach((item) => {
         // console.log("item: ", item)
-        const projectObj = new Element("li", {classes: "project-item", text: item.name})
+        const projectObj = new Element({tag: "li", classes: "project-item", text: item.name})
         const project = projectObj.create();
         list.append(project)
     })
-    const buttonObj = new Element("button", {id: "create-project", text: "Create Project"})
+    const buttonObj = new Element({tag: "button", id: "create-project", text: "Create Project"})
     const button = buttonObj.create();
     list.append(button)
 }
@@ -45,11 +45,11 @@ function updateTaskList() {
     const activeProject = projectsList[currentProjectIndex];
     const activeTasks = activeProject.getTasks();
     activeTasks.forEach((item) => {
-        const taskObj = new Element("li", {classes: "task-item", text: item.title});
+        const taskObj = new Element({tag: "li", classes: "task-item", text: item.title});
         const task = taskObj.create()
         list.append(task)
     })
-    const buttonObj = new Element("button", {id: "create-task", text: "Create Task"});
+    const buttonObj = new Element({tag: "button", id: "create-task", text: "Create Task"});
     const button = buttonObj.create();
     button.addEventListener("click", (e) => displayModal(e))
     list.append(button)
@@ -62,15 +62,24 @@ function displayModal(e) {
     if (e.target.id === "create-task") displayTaskForm()
 }
 function displayTaskForm() {
-    const formObj = new Element("form", {id: "task-form"});
+    const formObj = new Element({tag: "form", id: "task-form"});
     const form = formObj.create();
     form.method = "dialog";
-    const inputWrapperObj = new Element("div", {classes: "input-wrapper"})
+    const inputWrapperObj = new Element({tag: "div", classes: "input-wrapper"})
     const inputWrapper = inputWrapperObj.create()
-    const titleObj = new Input({id: "test", classes: "test", required: true});
-    const title = titleObj.create();
-    inputWrapper.append(title)
     
+    const titleInputObj = new Input({type: "text", id: "title-input", classes: "task-form-el", required: true});
+    console.log(titleInputObj)
+    const titleInput = titleInputObj.create();
+    const titleLabelObj = new Label({forLink: "title-input", id: "title-label", name: "title-label", text: "Name of Task"});
+    const titleLabel = titleLabelObj.create()
+    const descriptionInputObj = new Input({type: "text", id: "description-input", name: "description-input", classes: "task-form-el"});
+    const descriptionInput = descriptionInputObj.create();
+    const dueDateObj = new Input({type: "date", id: "due-date-input", name: "due-date-input", classes: "task-form-el"});
+    const dueDate = dueDateObj.create();
+
+
+    inputWrapper.append(titleLabel, titleInput, descriptionInput, dueDate)
     form.append(inputWrapper)
     modalWindow.append(form)
 }

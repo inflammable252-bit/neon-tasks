@@ -356,6 +356,8 @@ main section#card-wrapper {
 }
 
 dialog#modal-window {
+    display: flex;
+    flex-direction: column;
     position: absolute;
     top: 0;
     left: 0;
@@ -367,12 +369,10 @@ dialog#modal-window {
     box-shadow: calc(2px + 0.4vw) calc(2px + 0.4vw) color-mix(in srgb, var(--theme-current-op), #FFF 15%);
 }
 dialog img#close-modal {
+    align-self: end;
     height: calc(21px + 0.2vw);
     width: calc(21px + 0.2vw);
-    position: absolute;
     z-index: 1;
-    right: 0;
-    top: 0;
     margin: calc(0.5rem + 0.2vw);
     padding: 0.2em;
     background-color: #ffffff42;

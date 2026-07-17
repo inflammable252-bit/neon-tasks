@@ -1,9 +1,9 @@
 import { formatISO } from "date-fns";
-export { Element, Image, Input, Project, Note, ChecklistNote, DateNote, debounce, throttle }
+export { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote, debounce, throttle }
 
 //  Elements
 class Element {
-    constructor(tag, {id, classes, text} = {}) {
+    constructor({tag, id, classes, text} = {}) {
         this.tag = tag;
         this.id = id;
         this.classes = classes;
@@ -26,7 +26,7 @@ class Element {
 }
 
 class Input extends Element {
-    constructor({id, classes, text, type, name, required, placeholder, minlength} = {}) {
+    constructor({id, classes, text, type, name, required, placeholder, minlength}) {
         super({id, classes, text})
         this.tag = "input";
         this.type = type;
@@ -34,15 +34,27 @@ class Input extends Element {
         this.required = required;
         this.placeholder = placeholder;
         this.minlength = minlength;
-        this.element;
     }
-    update({id, classes, text, type, name, required, placeholder, minlength}={}) {
+    update({id, classes, text, type, name, required, placeholder, minlength}) {
         super.update({id, classes, text})
         if (type) this.element.type = type;
         if (name) this.element.name = name;
         if (required===true) this.element.setAttribute("required", "");
         if (placeholder) this.element.placeholder = placeholder;
         if (minlength) this.element.minlength;
+    }
+}
+class Label extends Element {
+    constructor({id, classes, text, forLink, form}) {
+        super({id, classes, text});
+        this.tag = "label";
+        this.forLink = forLink;
+        this.form = form;
+    }
+    update({id, classes, text, forLink, form}) {
+        super.update({id, classes, text})
+        if (forLink) this.element.forLink = forLink;
+        if (form) this.element.form = form;
     }
 }
 
