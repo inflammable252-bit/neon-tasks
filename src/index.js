@@ -2,7 +2,7 @@ import "./style.css"
 import "./reset.css"
 
 export { drag }
-import { populateCard, addDrag } from "./cards.js";
+import { populateCard, addDrag, displayTaskForm } from "./cards.js";
 import { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote } from "./components.js";
 
 let autoSpread = true;
@@ -14,8 +14,7 @@ const currentProjectIndex = 0;
 const body = document.querySelector("body");
 const cardWrapper = document.getElementById("card-wrapper");
 const isMobile = window.matchMedia("(pointer: coarse)").matches;
-const modeSelect = document.getElementById("mode-select")
-const modalWindow = document.getElementById("modal-window");
+const modeSelect = document.getElementById("mode-select");
 
 modeSelect.addEventListener("change", (e) => {
     changeTheme(e.target.value)
@@ -54,36 +53,14 @@ function updateTaskList() {
     button.addEventListener("click", (e) => displayModal(e))
     list.append(button)
 }
-
 function displayModal(e) {
     const closeButton = document.getElementById("close-modal");
-    closeButton.addEventListener("click", () => modalWindow.close())
-    modalWindow.showModal()
-    if (e.target.id === "create-task") displayTaskForm()
+    closeButton.addEventListener("click", () =>
+    modalWindow.close())
+
+    // modalWindow.showModal()
+    // if (e.target.id === "create-task") displayTaskForm()
 }
-function displayTaskForm() {
-    const formObj = new Element({tag: "form", id: "task-form"});
-    const form = formObj.create();
-    form.method = "dialog";
-    const inputWrapperObj = new Element({tag: "div", classes: "input-wrapper"})
-    const inputWrapper = inputWrapperObj.create()
-    
-    const titleInputObj = new Input({type: "text", id: "title-input", classes: "task-form-el", required: true});
-    console.log(titleInputObj)
-    const titleInput = titleInputObj.create();
-    const titleLabelObj = new Label({forLink: "title-input", id: "title-label", name: "title-label", text: "Name of Task"});
-    const titleLabel = titleLabelObj.create()
-    const descriptionInputObj = new Input({type: "text", id: "description-input", name: "description-input", classes: "task-form-el"});
-    const descriptionInput = descriptionInputObj.create();
-    const dueDateObj = new Input({type: "date", id: "due-date-input", name: "due-date-input", classes: "task-form-el"});
-    const dueDate = dueDateObj.create();
-
-
-    inputWrapper.append(titleLabel, titleInput, descriptionInput, dueDate)
-    form.append(inputWrapper)
-    modalWindow.append(form)
-}
-
 // displayTaskCreation()
 
 function addProject(projectName) {
@@ -107,10 +84,12 @@ function deleteTask(projectIndex, taskIndex) {
 }
 function addCardsToDesk(projectIndex) {
     for (const task of projectsList[projectIndex].taskList) {
-        const card = new Element("article", {classes: `card ${task.type.toLowerCase()}`}).create();
+        const cardObj = new Element({tag: "article", classes: `card ${task.type.toLowerCase()}`});
+        const card = cardObj.create();
         populateCard(task, card);
         cardWrapper.append(card);
         task.size = [card.clientWidth, card.clientHeight];
+        console.log(card)
     }
     if (drag) addDrag(cardWrapper, autoSpread)
 }
@@ -141,6 +120,12 @@ addTask(0, {title: "Your first note!", description: "Note description goes here.
 addTask(0, {title: "Checklist", description: "Checklist items go here.", dueDate: "2026-08-10T22:21:30-07:00", type: "Checklist"})
 addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "DateNote", dueDate: "2026-07-15T22:21:30-07:00", timer: true})
 updateTask(0, 0, {title: "1st task new name"})
+
+const modes = ["night", "dusk", "dawn"];
+mode = modes[Math.floor((Math.random() * 3))];
+changeTheme(mode);
+    
+displayTaskForm()
 
 addCardsToDesk(currentProjectIndex)
 updateProjectList()

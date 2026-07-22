@@ -1,15 +1,18 @@
 // Card builder functions
-export { populateCard, addDrag }
+export { populateCard, addDrag, displayTaskForm }
 import { drag } from "./index.js";
-import { Element, Image, Project, Note, ChecklistNote, DateNote, debounce, throttle } from "./components.js";
+import { Element, Label, Input, Image, Project, Note, ChecklistNote, DateNote, debounce, throttle } from "./components.js";
 import { format, formatDistance, formatISO, parseISO, getHours } from "date-fns";
 
 function populateCard(task, card) {
-    const title = new Element("h4", {classes: "card-header", text: task.title}).create()
-    const description = new Element("p", {classes: "card-text", text: task.description}).create()
+    const titleObj = new Element({tag: "h4", classes: "card-header", text: task.title});
+    const title = titleObj.create();
+    const descriptionObj = new Element({tag: "p", classes: "card-text", text: task.description});
+    const description = descriptionObj.create()
     
     const creation = format(task.created, "MM/dd/yyyy")
-    const createdDate = new Element("p", {classes: "card-created", text: creation}).create()
+    const createdDateObj = new Element({tag: "p", classes: "card-created", text: creation});
+    const createdDate = createdDateObj.create();
     card.position = "relative";
     
     if (task.type === "DateNote") {
@@ -19,29 +22,35 @@ function populateCard(task, card) {
     else card.append(title, createdDate, description, createCardTimeDiv(task, card));
 }
 function createCardTimeDiv(task, card) {
-    const timeSection = new Element("div", {classes: "card-time-section"}).create();
+    const timeSectionObj = new Element({tag: "div", classes: "card-time-section"})
+    const timeSection = timeSectionObj.create();
 
-    const deadlineHead = new Element("p", {classes: "card-deadline-head", text: "Deadline: "}).create()
+    const deadlineHeadObj = new Element({tag: "p", classes: "card-deadline-head", text: "Deadline: "})
+    const deadlineHead = deadlineHeadObj.create()
     if (task.dueDate) {
         if (task.type === "DateNote") {
             const dueDate = format(task.dueDate, "MM/dd/yyyy");
             const dueTime = format(task.dueDate, "hh:dd aaa");
-            const dueDateEle = new Element("p", {classes: "card-due", text: dueDate}).create()
-            const dueTimeEle = new Element("p", {classes: "card-due-time", text: dueTime}).create()
+            const dueDateEleObj = new Element({tag: "p", classes: "card-due", text: dueDate});
+            const dueDateEle = dueDateEleObj.create();
+            const dueTimeEleObj = new Element({tag:"p", classes: "card-due-time", text: dueTime});
+            const dueTimeEle = dueTimeEleObj.create();
             timeSection.append(dueDateEle, dueTimeEle)
         }
         else {
             const dueDate = (format(task.dueDate, 'MM/dd/yyyy')) + ", " + (format(task.dueDate, "hh:dd aaa"));
-            const dueDateEle = new Element("p", {classes: "card-due", text: dueDate}).create();
+            const dueDateEleObj = new Element({tag: "p", classes: "card-due", text: dueDate});
+            const dueDateEle = dueDateEleObj.create();
             timeSection.append(deadlineHead, dueDateEle)
         }
     }
     if (task.priority) {
-        const priority = new Element("p", {classes: "card-priority", text: "Priority: " + task.priority}).create();
+        const priorityObj = new Element({tag: "p", classes: "card-priority", text: "Priority: " + task.priority});const priority = priorityObj.create();
         timeSection.append(priority)
     }
     if (task.timer) {
-        const timerEle = new Element("p", {classes: "card-timer", text: "Time left: " + formatDistance(task.created, task.dueDate)}).create()
+        const timerEleObj = new Element({tag: "p", classes: "card-timer", text: "Time left: " + formatDistance(task.created, task.dueDate)});
+        const timerEle = timerEleObj.create();
         timeSection.append(timerEle)
     }
     return timeSection;
@@ -107,4 +116,116 @@ cards.forEach((card) => {
             card.style.top =  newY + "px";
         })
     }
+}
+
+// Card Modal Window
+
+const modalWindow = document.getElementById("modal-window");
+let select;
+
+function createButtons() {
+    const buttonWrapper = new Element({tag: "div", id: "button-wrapper"}).create()
+    const noteButton = new Element({tag: "button", id: "note-button", classes: "type-button selected", text: "Note"}).create();
+    const checklistButton = new Element({tag: "button", id: "checklist-button", classes: "type-button", text: "Checklist"}).create();
+    const dateButton = new Element({tag: "button", id: "date-button", classes: "type-button", text: "Date"}).create();
+
+    buttonWrapper.addEventListener("click", (e) => {
+        if (e.target.tagName !== "BUTTON") return
+        switch (e.target.id) {
+            case ("note-button"):
+                select = "note"
+                break;
+            case ("checklist-button"):
+                select = "checklist";
+                break;
+            case ("date-button"):
+                select = "date";
+                break;
+        }
+        console.log(select)
+    })
+
+    buttonWrapper.append(noteButton, checklistButton, dateButton)
+    return buttonWrapper;
+}
+function displayTaskForm() {
+
+    modalWindow.showModal()
+
+    modalWindow.append(createButtons())
+
+    const formObj = new Element({tag: "form", id: "task-form"});
+    const form = formObj.create();
+    form.method = "dialog";
+    const inputWrapperObj = new Element({tag: "div", classes: "input-wrapper"})
+    const inputWrapper = inputWrapperObj.create()
+    
+    const titleLabelObj = new Label(
+        {forLink: "title-input", id: "title-label", name: "title-label", text: "Name of Task"});
+    const titleLabel = titleLabelObj.create()
+    const titleInputObj = new Input({type: "text", id: "title-input", classes: "task-form-el", required: true});
+    console.log(titleInputObj)
+    const titleInput = titleInputObj.create();
+
+    const descriptionLabelObj = new Label(
+        {forLink: "description-input", id: "description-label", name: "description-name", text: "Task Description"});
+    const descriptionLabel = descriptionLabelObj.create();
+    const descriptionInputObj = new Element({tag: "textarea", id: "description-input", name: "description-input", classes: "task-form-el"});
+    const descriptionInput = descriptionInputObj.create();
+
+    inputWrapper.replaceChildren(titleLabel, titleInput, descriptionLabel, descriptionInput, buildDue(), buildPrioritySlider())
+    form.append(inputWrapper)
+    modalWindow.append(form)
+}
+function buildDue() {
+    const dueWrapper = new Element({tag: "div", id: "due-wrapper"}).create();
+
+    const dueDateLabelObj = new Label(
+    {forLink: "due-date-input", id: "due-date-label", name: "due-date-label", text: "Due"}
+    )
+    const dueDateLabel = dueDateLabelObj.create();
+    const dueDateObj = new Input({type: "date", id: "due-date-input", name: "due-date-input", classes: "task-form-el"});
+    const dueDate = dueDateObj.create();
+
+    const dueTimeLabelObj = new Label(
+        {forLink: "due-time-input", id: "due-time-label", name: "due-time-label", text: "Due"}
+    )
+    const dueTimeLabel = dueTimeLabelObj.create();
+    const dueTimeObj = new Input({type: "time", id: "due-time-input", name: "due-time-input", classes: "task-form-el"});
+    const dueTime = dueTimeObj.create();
+
+    dueWrapper.append(dueDateLabel, dueDate, dueTime);
+    return dueWrapper;
+}
+
+function buildPrioritySlider() {
+    const priorityWrapper = new Element({tag: "div", id: "priority-wrapper"}).create()
+    const priorityLabelObj = new Label({id: "priority-label", forLink: "priority-list", text: "Priority"})
+    const priorityLabel = priorityLabelObj.create();
+    const priorityObj = new Input({type: "range", id: "priority-list", text: "Priority"});
+    const priority = priorityObj.create();
+    priority.min = 0;
+    priority.max = 2;
+    priority.step = 1;
+    priority.value = 1;
+    priority.setAttribute("list", "priority-markers");
+    const priorityMarkers = new Element({tag: "datalist", id: "priority-markers"}).create();
+    const priorityMarkerLabels = new Element({tag: "div", id: "priority-marker-labels"}).create()
+    priority.addEventListener("change", (e) => {
+        console.log(e.target.value)
+    })
+
+    const priorities = ["Low", "Normal", "High"];
+    priorities.forEach((item, index) => {
+        const priorityOption = new Element({tag: "option", class: "priority-option"}).create();
+        priorityOption.value = index;
+        priorityOption.label = item;
+
+        const priorityOptionLabel = new Element({tag: "span", class: "priority-option-label", text: item}).create()
+
+        priorityMarkers.append(priorityOption)
+        priorityMarkerLabels.append(priorityOptionLabel)
+    })
+    priorityWrapper.append(priorityLabel, priority, priorityMarkers, priorityMarkerLabels);
+    return priorityWrapper;
 }

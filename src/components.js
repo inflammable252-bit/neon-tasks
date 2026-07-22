@@ -53,7 +53,7 @@ class Label extends Element {
     }
     update({id, classes, text, forLink, form}) {
         super.update({id, classes, text})
-        if (forLink) this.element.forLink = forLink;
+        if (forLink) this.element.htmlFor = forLink;
         if (form) this.element.form = form;
     }
 }
