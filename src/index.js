@@ -2,7 +2,7 @@ import "./style.css"
 import "./reset.css"
 
 export { drag }
-import { populateCard, addDrag, displayTaskForm } from "./cards.js";
+import { populateCard, addDrag, modalOn, displayTaskForm } from "./cards.js";
 import { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote } from "./components.js";
 
 let autoSpread = true;
@@ -54,12 +54,11 @@ function updateTaskList() {
     list.append(button)
 }
 function displayModal(e) {
+    modalOn("on");
     const closeButton = document.getElementById("close-modal");
     closeButton.addEventListener("click", () =>
-    modalWindow.close())
-
-    // modalWindow.showModal()
-    // if (e.target.id === "create-task") displayTaskForm()
+    modalOn("off"))
+    displayTaskForm()
 }
 // displayTaskCreation()
 
@@ -125,7 +124,6 @@ const modes = ["night", "dusk", "dawn"];
 mode = modes[Math.floor((Math.random() * 3))];
 changeTheme(mode);
     
-displayTaskForm()
 
 addCardsToDesk(currentProjectIndex)
 updateProjectList()

@@ -1,8 +1,8 @@
 // Card builder functions
-export { populateCard, addDrag, displayTaskForm }
+export { modalOn, populateCard, addDrag, displayTaskForm }
 import { drag } from "./index.js";
 import { Element, Label, Input, Image, Project, Note, ChecklistNote, DateNote, debounce, throttle } from "./components.js";
-import { format, formatDistance, formatISO, parseISO, getHours } from "date-fns";
+import { format, formatDistance, formatISO, parseISO, getHours, compareAsc } from "date-fns";
 
 function populateCard(task, card) {
     const titleObj = new Element({tag: "h4", classes: "card-header", text: task.title});
@@ -49,8 +49,27 @@ function createCardTimeDiv(task, card) {
         timeSection.append(priority)
     }
     if (task.timer) {
-        const timerEleObj = new Element({tag: "p", classes: "card-timer", text: "Time left: " + formatDistance(task.created, task.dueDate)});
+        const dueMsg = "Time left: " + formatDistance(task.created, task.dueDate);
+        const pastDueMsg = "Past due: " + formatDistance(task.created, task.dueDate);
+        let msg;
+        let color;
+        // note: 1 if the first date is after the second, -1 if the first date is before the second or 0 if dates are equal.
+        switch (compareAsc(task.created, task.dueDate)) {
+            case (1):
+                msg = pastDueMsg;
+                color = "rgba(255,125,125,0.8)";
+                break;
+                case (-1):
+                    msg = dueMsg;
+                    break;
+                case (0):
+                    msg = "Due today"
+                    color = "rgba(255, 189, 103, 0.78)";
+                break;
+        }
+        const timerEleObj = new Element({tag: "p", classes: "card-timer", text: msg});
         const timerEle = timerEleObj.create();
+        timerEle.style.color = color;
         timeSection.append(timerEle)
     }
     return timeSection;
@@ -121,8 +140,11 @@ cards.forEach((card) => {
 // Card Modal Window
 
 const modalWindow = document.getElementById("modal-window");
+const taskForm = document.getElementById("task-form");
 let select;
-
+function modalOn(state) {
+    state==="on" ? modalWindow.showModal() : modalWindow.close()
+}
 function createButtons() {
     const buttonWrapper = new Element({tag: "div", id: "button-wrapper"}).create()
     const noteButton = new Element({tag: "button", id: "note-button", classes: "type-button selected", text: "Note"}).create();
@@ -149,9 +171,6 @@ function createButtons() {
     return buttonWrapper;
 }
 function displayTaskForm() {
-
-    modalWindow.showModal()
-
     modalWindow.append(createButtons())
 
     const formObj = new Element({tag: "form", id: "task-form"});
