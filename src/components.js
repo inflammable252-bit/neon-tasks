@@ -137,13 +137,13 @@ class Project {
     addTaskToList(task) {
         let newTask;
         switch (task.type) {
-            case "Note":
+            case "note":
                 newTask = new Note(task);
                 break;
-                case "Checklist":
+            case "checklist":
                 newTask = new ChecklistNote(task);
                 break;
-                case "DateNote":
+            case "date":
                 newTask = new DateNote(task);
                 break;
         }

@@ -1,6 +1,6 @@
 // Card builder functions
 export { modalOn, populateCard, addDrag, displayTaskForm }
-import { drag } from "./index.js";
+import { projectsList, updateProjectList, updateTaskList, currentProjectIndex, addTask, addCardsToDesk, drag } from "./index.js";
 import { Element, Label, Input, Image, Project, Note, ChecklistNote, DateNote, debounce, throttle } from "./components.js";
 import { format, formatDistance, formatISO, parseISO, getHours, compareAsc } from "date-fns";
 
@@ -189,6 +189,25 @@ function createButtons() {
 function createSubmitButton() {
     const buttonObj = new Element({tag: "button", id: "submit", text: "Create"});
     const button = buttonObj.create();
+    button.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (form.title.value, form.description.value) {
+            addTask(currentProjectIndex, {
+                title: form.title.value, 
+                description: form.description.value, 
+                dueDate: form.dueDate?.value,
+                dueTime: form.dueTime?.value,
+                timer: form.timer?.value,
+                type: select,
+             })
+             addCardsToDesk(currentProjectIndex)
+        }
+        form.reset()
+        addCardsToDesk(currentProjectIndex)
+        updateProjectList()
+        updateTaskList()
+        modalWindow.close()
+    })
     return button;
 }
 function displayTaskForm() {
@@ -204,15 +223,16 @@ function displayTaskForm() {
     const titleLabelObj = new Label(
         {forLink: "title-input", id: "title-label", name: "title-label", text: "Name of Task"});
     const titleLabel = titleLabelObj.create()
-    const titleInputObj = new Input({type: "text", id: "title-input", classes: "task-form-el", required: true});
+    const titleInputObj = new Input({type: "text", name: "title", id: "title-input", classes: "task-form-el", required: true});
     console.log(titleInputObj)
     const titleInput = titleInputObj.create();
 
     const descriptionLabelObj = new Label(
-        {forLink: "description-input", id: "description-label", name: "description-name", text: "Task Description"});
+        {forLink: "description-input", id: "description-label", name: "description-label", text: "Task Description"});
     const descriptionLabel = descriptionLabelObj.create();
-    const descriptionInputObj = new Element({tag: "textarea", id: "description-input", name: "description-input", classes: "task-form-el"});
+    const descriptionInputObj = new Element({tag: "textarea", id: "description-input", classes: "task-form-el"});
     const descriptionInput = descriptionInputObj.create();
+    descriptionInput.name= "description";
 
     inputWrapper.replaceChildren(titleLabel, titleInput, descriptionLabel, descriptionInput, buildDue(), buildPrioritySlider(), createSubmitButton())
     form.append(inputWrapper)

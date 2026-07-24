@@ -1,7 +1,7 @@
 import "./style.css"
 import "./reset.css"
 
-export { drag }
+export { projectsList, updateProjectList, updateTaskList, currentProjectIndex, drag, addTask, addCardsToDesk }
 import { populateCard, addDrag, modalOn, displayTaskForm } from "./cards.js";
 import { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote } from "./components.js";
 
@@ -28,6 +28,7 @@ dragToggle.addEventListener("change", (e) => {
 
 function updateProjectList() {
     const list = document.querySelector("#projects-list ul");
+    list.replaceChildren("")
     projectsList.forEach((item) => {
         // console.log("item: ", item)
         const projectObj = new Element({tag: "li", classes: "project-item", text: item.name})
@@ -41,6 +42,7 @@ function updateProjectList() {
 
 function updateTaskList() {
     const list = document.querySelector("#tasks-list ul");
+    list.replaceChildren("")
     const activeProject = projectsList[currentProjectIndex];
     const activeTasks = activeProject.getTasks();
     activeTasks.forEach((item) => {
@@ -81,15 +83,28 @@ function deleteTask(projectIndex, taskIndex) {
     projectsList[projectIndex].taskList.splice(taskIndex, 1)
 }
 function addCardsToDesk(projectIndex) {
-    for (const task of projectsList[projectIndex].taskList) {
-        const cardObj = new Element({tag: "article", classes: `card ${task.type.toLowerCase()}`});
-        const card = cardObj.create();
-        populateCard(task, card);
-        cardWrapper.append(card);
-        task.size = [card.clientWidth, card.clientHeight];
-        console.log(card)
+    let cards = document.getElementsByClassName("card");
+    const currentProj = projectsList[currentProjectIndex].taskList;
+    if (cards.length === currentProj) return;
+    if (cards.length === 0) {
+        for (const task of currentProj) {
+            addCard(task)
+        }
     }
+    if (currentProj.length > cards.length) {
+        let newIndex = cards.length;
+        addCard(currentProj[newIndex])
+    }
+    console.log(cards)
     if (drag) addDrag(cardWrapper, autoSpread)
+}
+function addCard(task) {
+    const cardObj = new Element({tag: "article", classes: `card type-${task.type}`});
+
+    const card = cardObj.create();
+    populateCard(task, card);
+    cardWrapper.append(card);
+    task.size = [card.clientWidth, card.clientHeight];
 }
 
 function changeTheme(theme) {
@@ -116,16 +131,15 @@ function changeTheme(theme) {
 
 addProject("Your First Project")
 addProject("Your Second Project")
-addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "Note", dueDate: "2026-07-30T22:21:30-07:00"})
-addTask(0, {title: "Checklist", description: "Checklist items go here.", dueDate: "2026-08-10T22:21:30-07:00", type: "Checklist"})
-addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "DateNote", dueDate: "2026-07-15", dueTime: "15:00", timer: true})
+addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "note", dueDate: "2026-07-30T22:21:30-07:00"})
+addTask(0, {title: "Checklist", description: "Checklist items go here.", dueDate: "2026-08-10T22:21:30-07:00", type: "checklist"})
+addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-15", dueTime: "15:00", timer: true})
 updateTask(0, 0, {title: "1st task new name"})
 
 const modes = ["night", "dusk", "dawn"];
 mode = modes[Math.floor((Math.random() * 3))];
 changeTheme(mode);
     
-
 addCardsToDesk(currentProjectIndex)
 updateProjectList()
 updateTaskList()
