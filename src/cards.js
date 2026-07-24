@@ -30,7 +30,7 @@ function createCardTimeDiv(task, card) {
     if (task.dueDate) {
         if (task.type === "DateNote") {
             const dueDate = format(task.dueDate, "MM/dd/yyyy");
-            const dueTime = format(task.dueDate, "hh:dd aaa");
+            const dueTime = task.dueTime;
             const dueDateEleObj = new Element({tag: "p", classes: "card-due", text: dueDate});
             const dueDateEle = dueDateEleObj.create();
             const dueTimeEleObj = new Element({tag:"p", classes: "card-due-time", text: dueTime});
@@ -140,22 +140,26 @@ cards.forEach((card) => {
 // Card Modal Window
 
 const modalWindow = document.getElementById("modal-window");
-const taskForm = document.getElementById("task-form");
-let select;
+const buttonWrapper = document.getElementById("button-wrapper");
+const form = document.querySelector("form.modal-form");
+let select = "note";
 function modalOn(state) {
     state==="on" ? modalWindow.showModal() : modalWindow.close()
 }
 function createButtons() {
-    const buttonWrapper = new Element({tag: "div", id: "button-wrapper"}).create()
+    select = "note";
     const noteButton = new Element({tag: "button", id: "note-button", classes: "type-button selected", text: "Note"}).create();
     const checklistButton = new Element({tag: "button", id: "checklist-button", classes: "type-button", text: "Checklist"}).create();
     const dateButton = new Element({tag: "button", id: "date-button", classes: "type-button", text: "Date"}).create();
 
     buttonWrapper.addEventListener("click", (e) => {
         if (e.target.tagName !== "BUTTON") return
+        for (const button of buttonWrapper.children) {
+            button.classList.remove("selected")
+        }
         switch (e.target.id) {
             case ("note-button"):
-                select = "note"
+                select = "note";
                 break;
             case ("checklist-button"):
                 select = "checklist";
@@ -163,19 +167,37 @@ function createButtons() {
             case ("date-button"):
                 select = "date";
                 break;
+            }
+        switch (select) {
+            case ("note"):
+                noteButton.className = "type-button selected";
+                form.id = "note-form"
+                break;
+            case ("checklist"):
+                checklistButton.className = "type-button selected";
+                form.id = "checklist-form";
+                break;
+            case ("date"):
+                dateButton.className = "type-button selected";
+                form.id = "date-form";
+                break;
         }
-        console.log(select)
     })
-
-    buttonWrapper.append(noteButton, checklistButton, dateButton)
+    buttonWrapper.replaceChildren(noteButton, checklistButton, dateButton)
     return buttonWrapper;
 }
+function createSubmitButton() {
+    const buttonObj = new Element({tag: "button", id: "submit", text: "Create"});
+    const button = buttonObj.create();
+    return button;
+}
 function displayTaskForm() {
-    modalWindow.append(createButtons())
+    createButtons()
 
-    const formObj = new Element({tag: "form", id: "task-form"});
-    const form = formObj.create();
+    if (form.id === `${select}-form`) return;
+    form.replaceChildren("");
     form.method = "dialog";
+    form.id = `${select}-form`;
     const inputWrapperObj = new Element({tag: "div", classes: "input-wrapper"})
     const inputWrapper = inputWrapperObj.create()
     
@@ -192,9 +214,8 @@ function displayTaskForm() {
     const descriptionInputObj = new Element({tag: "textarea", id: "description-input", name: "description-input", classes: "task-form-el"});
     const descriptionInput = descriptionInputObj.create();
 
-    inputWrapper.replaceChildren(titleLabel, titleInput, descriptionLabel, descriptionInput, buildDue(), buildPrioritySlider())
+    inputWrapper.replaceChildren(titleLabel, titleInput, descriptionLabel, descriptionInput, buildDue(), buildPrioritySlider(), createSubmitButton())
     form.append(inputWrapper)
-    modalWindow.append(form)
 }
 function buildDue() {
     const dueWrapper = new Element({tag: "div", id: "due-wrapper"}).create();
@@ -218,7 +239,7 @@ function buildDue() {
 }
 
 function buildPrioritySlider() {
-    const priorityWrapper = new Element({tag: "div", id: "priority-wrapper"}).create()
+    const priorityAndTimerWrapper = new Element({tag: "div", id: "priority-wrapper"}).create()
     const priorityLabelObj = new Label({id: "priority-label", forLink: "priority-list", text: "Priority"})
     const priorityLabel = priorityLabelObj.create();
     const priorityObj = new Input({type: "range", id: "priority-list", text: "Priority"});
@@ -245,6 +266,12 @@ function buildPrioritySlider() {
         priorityMarkers.append(priorityOption)
         priorityMarkerLabels.append(priorityOptionLabel)
     })
-    priorityWrapper.append(priorityLabel, priority, priorityMarkers, priorityMarkerLabels);
-    return priorityWrapper;
+
+    const timerCheckLabelObj = new Label({id: "timer-label", forLink: "timer-check", text: "Timer"});
+    const timerCheckLabel = timerCheckLabelObj.create();
+    const timerCheckObj = new Input({type: "checkbox", name: "timer", id: "timer-check", value: "on"});
+    const timerCheck = timerCheckObj.create();
+
+    priorityAndTimerWrapper.append(priorityLabel, priority, priorityMarkers, priorityMarkerLabels, timerCheckLabel, timerCheck);
+    return priorityAndTimerWrapper;
 }

@@ -1,4 +1,4 @@
-import { formatISO } from "date-fns";
+import { format, formatISO } from "date-fns";
 export { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote, debounce, throttle }
 
 //  Elements
@@ -86,17 +86,18 @@ class Image  {
 
 // Notes
 class Note {
-    constructor({title, description, dueDate, created, priority, size, position, type}) {
+    constructor({title, description, dueDate, dueTime, created, priority, size, position, type}) {
         this.title = title;
         this.description = description;
         this.priority = priority
         this.dueDate = dueDate;
+        this.dueTime = dueTime;
         this.created = this.newDate()
         this.size = size;
         this.position = position;
         this.type = type;
     }
-    update({title, description, dueDate, priority, size, position}) {
+    update({title, description, dueDate, dueTime, priority, size, position}) {
         if (title) this.title = title;
         if (description) this.description = description;
         if (priority) this.priority = priority
@@ -111,19 +112,19 @@ class Note {
     }
 }
 class ChecklistNote extends Note {
-    constructor({title, description, dueDate, created, priority, size, position, type}){
-        super({title, description, dueDate, priority, size, position})
+    constructor({title, description, dueDate, dueTime, created, priority, size, position, type}){
+        super({title, description, dueDate, dueTime, priority, size, position})
         this.type = type
     }
 }
 class DateNote extends Note {
-    constructor({title, description, dueDate, created, priority, size, position, timer, type}){
-        super({title, description, dueDate, priority, size, position})
+    constructor({title, description, dueDate, dueTime, created, priority, size, position, timer, type}){
+        super({title, description, dueDate, dueTime, priority, size, position})
         this.timer = timer
         this.type = "DateNote"
     }
-    update({title, description, dueDate, priority, size, position, timer}) {
-        super.update({title, description, dueDate, priority, size, position})
+    update({title, description, dueDate, dueTime, priority, size, position, timer}) {
+        super.update({title, description, dueDate, dueTime, priority, size, position})
         if (timer) this.timer = timer;
     }
 }

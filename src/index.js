@@ -53,14 +53,13 @@ function updateTaskList() {
     button.addEventListener("click", (e) => displayModal(e))
     list.append(button)
 }
-function displayModal(e) {
+function displayModal() {
     modalOn("on");
     const closeButton = document.getElementById("close-modal");
     closeButton.addEventListener("click", () =>
     modalOn("off"))
     displayTaskForm()
 }
-// displayTaskCreation()
 
 function addProject(projectName) {
     const newProject = new Project(projectName);
@@ -111,13 +110,15 @@ function changeTheme(theme) {
     root.style.setProperty("--theme-current-accent", `var(${newAccent})`);
     root.style.setProperty("--theme-current-font", `var(${newFont})`);
     root.style.setProperty("--theme-current-font-l", `var(${newFontL})`);
+
+    modeSelect.value = theme
 }
 
 addProject("Your First Project")
 addProject("Your Second Project")
-addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "Note"})
+addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "Note", dueDate: "2026-07-30T22:21:30-07:00"})
 addTask(0, {title: "Checklist", description: "Checklist items go here.", dueDate: "2026-08-10T22:21:30-07:00", type: "Checklist"})
-addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "DateNote", dueDate: "2026-07-15T22:21:30-07:00", timer: true})
+addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "DateNote", dueDate: "2026-07-15", dueTime: "15:00", timer: true})
 updateTask(0, 0, {title: "1st task new name"})
 
 const modes = ["night", "dusk", "dawn"];
