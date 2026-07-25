@@ -1,4 +1,4 @@
-import { format, formatISO } from "date-fns";
+import { parse, format, formatISO } from "date-fns";
 export { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote, debounce, throttle }
 
 //  Elements
@@ -92,10 +92,20 @@ class Note {
         this.priority = priority
         this.dueDate = dueDate;
         this.dueTime = dueTime;
+        this.due = this.calculateDue();
         this.created = this.newDate()
         this.size = size;
         this.position = position;
         this.type = type;
+    }
+    calculateDue() {
+        const withTime = new Date(`${this.dueDate}T${this.dueTime}`);
+        const withoutTime = new Date(`${this.dueDate}T00:00`)
+        if (this.dueTime) return format(withTime, "MM/dd/yyyy, hh:mm a");
+        else {
+            this.dueTime = "12:00";
+            return format(withoutTime, "MM/dd/yyyy")
+        }
     }
     update({title, description, dueDate, dueTime, priority, size, position}) {
         if (title) this.title = title;

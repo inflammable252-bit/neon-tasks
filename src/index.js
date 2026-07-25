@@ -29,11 +29,14 @@ dragToggle.addEventListener("change", (e) => {
 function updateProjectList() {
     const list = document.querySelector("#projects-list ul");
     list.replaceChildren("")
+    let counter = 0;
     projectsList.forEach((item) => {
         // console.log("item: ", item)
         const projectObj = new Element({tag: "li", classes: "project-item", text: item.name})
         const project = projectObj.create();
-        list.append(project)
+        if (counter === currentProjectIndex) project.classList.add("selected-project");
+        list.append(project);
+        counter++
     })
     const buttonObj = new Element({tag: "button", id: "create-project", text: "Create Project"})
     const button = buttonObj.create();
@@ -52,7 +55,7 @@ function updateTaskList() {
     })
     const buttonObj = new Element({tag: "button", id: "create-task", text: "Create Task"});
     const button = buttonObj.create();
-    button.addEventListener("click", (e) => displayModal(e))
+    button.addEventListener("click", (e) => displayModal())
     list.append(button)
 }
 function displayModal() {
@@ -62,7 +65,16 @@ function displayModal() {
     modalOn("off"))
     displayTaskForm()
 }
-
+const addIcon = document.getElementById("add-icon");
+addIcon.addEventListener("click", () => {
+    displayModal()
+})
+const listIcon = document.getElementById("list-icon");
+listIcon.addEventListener("click", () => toggleSidebar())
+function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    sidebar.classList.toggle("show")
+}
 function addProject(projectName) {
     const newProject = new Project(projectName);
     projectsList.push(newProject)
@@ -131,9 +143,9 @@ function changeTheme(theme) {
 
 addProject("Your First Project")
 addProject("Your Second Project")
-addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "note", dueDate: "2026-07-30T22:21:30-07:00"})
-addTask(0, {title: "Checklist", description: "Checklist items go here.", dueDate: "2026-08-10T22:21:30-07:00", type: "checklist"})
-addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-15", dueTime: "15:00", timer: true})
+addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "note", dueDate: "2026-07-24"})
+addTask(0, {title: "Checklist", description: "Checklist items go here.", dueDate: "2026-07-24", dueTime: "17:00", type: "checklist"})
+addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-24", dueTime: "20:00", timer: true})
 updateTask(0, 0, {title: "1st task new name"})
 
 const modes = ["night", "dusk", "dawn"];

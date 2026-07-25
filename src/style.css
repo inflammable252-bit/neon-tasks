@@ -65,10 +65,7 @@ body {
     grid-template-columns: auto 1fr;
     background-color: var(--bg-current-color);
 }
-@media (min-width: 768px) {
-    body {
-    }
-}
+
 h2, h3, h4 {
     color: var(--theme-current-font);
     font-family: var(--p-strong);
@@ -154,7 +151,54 @@ div#header-right select {
     padding: 0.1rem;
     width: min-content;
 }
-
+aside#sidebar {
+    background-color: color-mix(in srgb, var(--theme-current-color), #ffffffc9 25%);
+    color: #FFF;
+    font-family: var(--p-strong);
+    
+    display: grid;
+    grid-template-rows: 75px min-content min-content min-content;
+    gap: 3vw;
+    padding: 1vw;
+    z-index: 9;
+    width: 0;
+    height: 100%;
+    position: absolute;
+    overflow: hidden;
+    transition: width 0.2s ease-in-out;
+}
+aside#sidebar details {
+        display: none;
+        ::marker {
+            color: var(--theme-current-font-l)
+        }
+        summary {
+            color: color-mix(in srgb, var(--theme-current-font), #FFF 60%);
+        }
+}
+aside#sidebar.show {
+    width: calc(200px + 1vw);
+    position: absolute;
+    details {
+        display: block;
+    }
+}
+aside#sidebar details#projects-list {
+        grid-row: 2/3;
+    }
+    aside#sidebar details#tasks-list {
+        grid-row: 3/4;
+    }
+aside#sidebar ul {
+        list-style-type: none;
+    }
+aside#sidebar li.selected-project {
+        background-color: #ffffff31;
+        border-radius: 6px;
+    }
+    li {
+        padding-left: 0.5em;
+    }
 @media (min-width: 768px) {
     div#header-right div#input-wrapper {
         display: flex;
@@ -164,7 +208,6 @@ div#header-right select {
 aside#sidebar {
     grid-row: 1/-1;
     grid-column: 1/2;
-    width: 0;
 }
 main {
     grid-row: 2/3;
@@ -205,34 +248,19 @@ div.menu-buttons-wrapper img {
     nav {
         height: 25px;
     }
-    aside#sidebar {
+    aside#sidebar, aside#sidebar.show {
+        position: static;
         width: calc(250px + 1vw);
-        background-color: color-mix(in srgb, var(--theme-current-color), #ffffff73 40%);
-        display: grid;
-        grid-template-rows: 75px min-content min-content min-content;
-        gap: 2vw;
         font-size: 1.2rem;
-        padding: 1vw;
-        color: #FFF;
-        font-family: var(--p-strong);
-    }
-    aside#sidebar details {
-        ::marker {
-            color: var(--theme-current-font-l)
+        background-color: color-mix(in srgb, var(--theme-current-color), #ffffff71 40%);
+        details {
+        display: block;
         }
-    }
-    aside#sidebar ul {
-        list-style-type: none;
-    }
-    aside#sidebar details#projects-list {
-        grid-row: 2/3;
-    }
-    aside#sidebar details#tasks-list {
-        grid-row: 3/4;
     }
     div.menu-buttons-wrapper {
         display: none;
     }
+    
 }
 
 main section#card-wrapper {

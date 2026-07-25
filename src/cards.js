@@ -29,8 +29,9 @@ function createCardTimeDiv(task, card) {
     const deadlineHead = deadlineHeadObj.create()
     if (task.dueDate) {
         if (task.type === "DateNote") {
-            const dueDate = format(task.dueDate, "MM/dd/yyyy");
+            const dueDate = format(parseISO(task.dueDate), "MM/dd/yyyy");
             const dueTime = task.dueTime;
+            const due = task.due;
             const dueDateEleObj = new Element({tag: "p", classes: "card-due", text: dueDate});
             const dueDateEle = dueDateEleObj.create();
             const dueTimeEleObj = new Element({tag:"p", classes: "card-due-time", text: dueTime});
@@ -38,8 +39,8 @@ function createCardTimeDiv(task, card) {
             timeSection.append(dueDateEle, dueTimeEle)
         }
         else {
-            const dueDate = (format(task.dueDate, 'MM/dd/yyyy')) + ", " + (format(task.dueDate, "hh:dd aaa"));
-            const dueDateEleObj = new Element({tag: "p", classes: "card-due", text: dueDate});
+            const due = task.due;
+            const dueDateEleObj = new Element({tag: "p", classes: "card-due", text: due});
             const dueDateEle = dueDateEleObj.create();
             timeSection.append(deadlineHead, dueDateEle)
         }
@@ -49,23 +50,24 @@ function createCardTimeDiv(task, card) {
         timeSection.append(priority)
     }
     if (task.timer) {
-        const dueMsg = "Time left: " + formatDistance(task.created, task.dueDate);
-        const pastDueMsg = "Past due: " + formatDistance(task.created, task.dueDate);
+        const dueMsg = "Time left: " + formatDistance(task.created, formatISO(task.due));
+        const pastDueMsg = "Past due: " + formatDistance(task.created, formatISO(task.due));
         let msg;
         let color;
         // note: 1 if the first date is after the second, -1 if the first date is before the second or 0 if dates are equal.
-        switch (compareAsc(task.created, task.dueDate)) {
+        console.log(task.created, task.due)
+        switch (compareAsc(task.created, task.due)) {
             case (1):
                 msg = pastDueMsg;
                 color = "rgba(255,125,125,0.8)";
                 break;
-                case (-1):
+            case (-1):
                     msg = dueMsg;
                     break;
-                case (0):
+            case (0):
                     msg = "Due today"
                     color = "rgba(255, 189, 103, 0.78)";
-                break;
+            break;
         }
         const timerEleObj = new Element({tag: "p", classes: "card-timer", text: msg});
         const timerEle = timerEleObj.create();
@@ -191,17 +193,18 @@ function createSubmitButton() {
     const button = buttonObj.create();
     button.addEventListener("click", (e) => {
         e.preventDefault();
-        if (form.title.value, form.description.value) {
+        if (form.title.value && form.description.value) {
             addTask(currentProjectIndex, {
                 title: form.title.value, 
                 description: form.description.value, 
-                dueDate: form.dueDate?.value,
-                dueTime: form.dueTime?.value,
+                dueDate: form["due-date-input"]?.value,
+                dueTime: form["due-time-input"]?.value,
+                priority: currentPriority,
                 timer: form.timer?.value,
                 type: select,
              })
-             addCardsToDesk(currentProjectIndex)
         }
+        if (!errorCheck(form.title, form.description)) return
         form.reset()
         addCardsToDesk(currentProjectIndex)
         updateProjectList()
@@ -210,9 +213,30 @@ function createSubmitButton() {
     })
     return button;
 }
+function errorCheck(item1, item2) {
+    const color = "2px solid rgba(255, 0, 0, 0.61)";
+    let result;
+    if (!item1.value) {
+            item1.style.border = color;
+            result = false;
+        }
+    if (!item2.value) {
+        item2.style.border = color;
+        result = false;
+    }
+    else {
+        resetErrors(item1, item2)
+        result = true;
+    }
+    return result
+}
+function resetErrors(item1, item2) {
+    item1.style.border = "none"
+    item2.style.border = "none"
+}
 function displayTaskForm() {
     createButtons()
-
+    
     if (form.id === `${select}-form`) return;
     form.replaceChildren("");
     form.method = "dialog";
@@ -257,7 +281,7 @@ function buildDue() {
     dueWrapper.append(dueDateLabel, dueDate, dueTime);
     return dueWrapper;
 }
-
+let currentPriority;
 function buildPrioritySlider() {
     const priorityAndTimerWrapper = new Element({tag: "div", id: "priority-wrapper"}).create()
     const priorityLabelObj = new Label({id: "priority-label", forLink: "priority-list", text: "Priority"})
@@ -265,17 +289,30 @@ function buildPrioritySlider() {
     const priorityObj = new Input({type: "range", id: "priority-list", text: "Priority"});
     const priority = priorityObj.create();
     priority.min = 0;
-    priority.max = 2;
+    priority.max = 3;
     priority.step = 1;
-    priority.value = 1;
     priority.setAttribute("list", "priority-markers");
+    priority.setAttribute("value", "0");
     const priorityMarkers = new Element({tag: "datalist", id: "priority-markers"}).create();
     const priorityMarkerLabels = new Element({tag: "div", id: "priority-marker-labels"}).create()
     priority.addEventListener("change", (e) => {
-        console.log(e.target.value)
+        switch (e.target.value) {
+            case ("0"):
+                currentPriority = "";
+                break;
+            case ("1"):
+                currentPriority = "Low";
+                break;
+            case ("2"):
+                currentPriority = "Medium";
+                break;
+            case ("3"):
+                currentPriority = "High";
+                break;
+        }
     })
 
-    const priorities = ["Low", "Normal", "High"];
+    const priorities = ["None", "Low", "Medium", "High"];
     priorities.forEach((item, index) => {
         const priorityOption = new Element({tag: "option", class: "priority-option"}).create();
         priorityOption.value = index;
