@@ -132,6 +132,9 @@ class Note {
         cardWrapper.append(card);
         this.size = [card.clientWidth, card.clientHeight];
     }
+    remove() {
+        console.log(this)
+    }
 }
 class ChecklistNote extends Note {
     constructor({title, description, dueDate, dueTime, created, priority, size, position, type}){

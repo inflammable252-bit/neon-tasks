@@ -87,7 +87,6 @@ const header = document.querySelector("header");
 cards.forEach((card) => {
     let offsetX, offsetY;
     card.addEventListener("pointerdown", (e) => {
-            console.log(drag)
             if (!drag) return;
             let sidebarOffsetX = (sidebar.getBoundingClientRect().right) || 0;
             let navOffsetY = nav.getBoundingClientRect().top;
@@ -98,7 +97,7 @@ cards.forEach((card) => {
             container.addEventListener("pointermove", pointerMoveHandler);
             container.addEventListener("pointerup", pointerupHandler)
             card.style.transition = "";
-            console.log(offsetY)
+            // console.log(offsetY)
         });
 
         function pointerMoveHandler(e) {

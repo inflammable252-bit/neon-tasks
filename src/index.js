@@ -12,10 +12,14 @@ let mode = "dawn"
 const projectsList = []
 const currentProjectIndex = 0;
 
+const modeSelect = document.getElementById("mode-select");
+const modes = ["night", "dusk", "dawn"];
+mode = modes[Math.floor((Math.random() * 3))];
+changeTheme(mode);
+
 const body = document.querySelector("body");
 const cardWrapper = document.getElementById("card-wrapper");
 const isMobile = window.matchMedia("(pointer: coarse)").matches;
-const modeSelect = document.getElementById("mode-select");
 
 modeSelect.addEventListener("change", (e) => {
     changeTheme(e.target.value)
@@ -94,10 +98,10 @@ function getTask(projectIndex, taskIndex) {
 function updateTask(projectIndex, taskIndex, update) {
     getTask(projectIndex, taskIndex).update(update)
 }
-function deleteTask(projectIndex, taskIndex) {
+function deleteTaskOLD(projectIndex, taskIndex) {
     projectsList[projectIndex].taskList.splice(taskIndex, 1)
 }
-function addCardsToDesk(projectIndex) {
+function addCardsToDeskOLD(projectIndex) {
     let cards = document.getElementsByClassName("card");
     const currentProj = projectsList[currentProjectIndex].taskList;
     if (cards.length === currentProj) return;
@@ -112,6 +116,18 @@ function addCardsToDesk(projectIndex) {
     }
     console.log(cards)
     if (drag) addDrag(cardWrapper, autoSpread)
+}
+
+function addCardsToDesk(projectIndex) {
+    const currentProjectTasks = projectsList[projectIndex].taskList;
+    let counter = 0;
+    for (const task of currentProjectTasks) {
+        task.createCard()
+        task.assignedIndex = counter;
+        counter++
+    }
+    if (drag) addDrag(cardWrapper, autoSpread)    
+    console.log(currentProjectTasks)
 }
 function addCard(task) {
     const cardObj = new Element({tag: "article", classes: `card type-${task.type}`});
@@ -150,11 +166,19 @@ addTask(0, {title: "Your first note!", description: "Note description goes here.
 addTask(0, {title: "Checklist", description: "Checklist items go here.", dueDate: "2026-07-24", dueTime: "17:00", type: "checklist"})
 addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-24", dueTime: "20:00", timer: true})
 // updateTask(0, 0, {title: "1st task new name"})
-
-const modes = ["night", "dusk", "dawn"];
-mode = modes[Math.floor((Math.random() * 3))];
-changeTheme(mode);
     
+// addCardsToDesk(currentProjectIndex)
 addCardsToDesk(currentProjectIndex)
+function deleteTask(projectIndex, taskIndex) {
+    const currentTasks = projectsList[projectIndex].taskList;
+    const currentCards = document.querySelectorAll("article.card");
+    console.log(`Deleted ${currentTasks[taskIndex].type}: ${currentTasks[taskIndex].title}!`);
+    delete currentTasks[taskIndex];
+    currentCards[taskIndex].remove()
+    console.log(currentTasks)
+
+}
+deleteTask(0, 0)
+
 updateProjectList()
 updateTaskList()
