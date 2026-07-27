@@ -1,5 +1,6 @@
 import { parse, format, formatISO } from "date-fns";
 export { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote, debounce, throttle }
+import { populateCard } from "./cards.js"
 
 //  Elements
 class Element {
@@ -92,13 +93,14 @@ class Note {
         this.priority = priority
         this.dueDate = dueDate;
         this.dueTime = dueTime;
-        this.due = this.calculateDue();
+        this.due = this.getDue();
         this.created = this.newDate()
         this.size = size;
         this.position = position;
         this.type = type;
     }
-    calculateDue() {
+    getDue() {
+        if (!this.dueDate) return;
         const withTime = new Date(`${this.dueDate}T${this.dueTime}`);
         const withoutTime = new Date(`${this.dueDate}T00:00`)
         if (this.dueTime) return format(withTime, "MM/dd/yyyy, hh:mm a");
@@ -111,7 +113,7 @@ class Note {
         if (title) this.title = title;
         if (description) this.description = description;
         if (priority) this.priority = priority
-        if (dueDate) this.dueDate = dueDate;
+        if (dueDate) this.due = this.getDue();
         if (size) this.size = size;
         if (position) this.position = position;
     }
@@ -119,6 +121,16 @@ class Note {
         if (!this.created) {
             return formatISO(new Date())
         }
+    }
+    createCard() {
+        const cardObj = new Element({tag: "article", classes: `card type-${this.type}`});
+        const card = cardObj.create();
+        const cardWrapper = document.getElementById("card-wrapper");
+
+        populateCard(this, card);
+        
+        cardWrapper.append(card);
+        this.size = [card.clientWidth, card.clientHeight];
     }
 }
 class ChecklistNote extends Note {

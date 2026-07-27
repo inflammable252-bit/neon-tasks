@@ -2,7 +2,8 @@ import "./style.css"
 import "./reset.css"
 
 export { projectsList, updateProjectList, updateTaskList, currentProjectIndex, drag, addTask, addCardsToDesk }
-import { populateCard, addDrag, modalOn, displayProjectForm, displayTaskForm } from "./cards.js";
+import { populateCard, addDrag } from "./cards.js";
+import { modalOn, displayProjectForm, displayTaskForm } from "./modal-window.js"
 import { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote } from "./components.js";
 
 let autoSpread = true;
@@ -145,10 +146,10 @@ function changeTheme(theme) {
 
 addProject("Your First Project")
 addProject("Your Second Project")
-addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "note", dueDate: "2026-07-24"})
+addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "note"})
 addTask(0, {title: "Checklist", description: "Checklist items go here.", dueDate: "2026-07-24", dueTime: "17:00", type: "checklist"})
 addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-24", dueTime: "20:00", timer: true})
-updateTask(0, 0, {title: "1st task new name"})
+// updateTask(0, 0, {title: "1st task new name"})
 
 const modes = ["night", "dusk", "dawn"];
 mode = modes[Math.floor((Math.random() * 3))];
