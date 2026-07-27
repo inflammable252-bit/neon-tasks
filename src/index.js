@@ -2,7 +2,7 @@ import "./style.css"
 import "./reset.css"
 
 export { projectsList, updateProjectList, updateTaskList, currentProjectIndex, drag, addTask, addCardsToDesk }
-import { populateCard, addDrag, modalOn, displayTaskForm } from "./cards.js";
+import { populateCard, addDrag, modalOn, displayProjectForm, displayTaskForm } from "./cards.js";
 import { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote } from "./components.js";
 
 let autoSpread = true;
@@ -40,6 +40,7 @@ function updateProjectList() {
     })
     const buttonObj = new Element({tag: "button", id: "create-project", text: "Create Project"})
     const button = buttonObj.create();
+    button.addEventListener("click", (e) => displayModal(e))
     list.append(button)
 }
 
@@ -55,15 +56,16 @@ function updateTaskList() {
     })
     const buttonObj = new Element({tag: "button", id: "create-task", text: "Create Task"});
     const button = buttonObj.create();
-    button.addEventListener("click", (e) => displayModal())
+    button.addEventListener("click", (e) => displayModal(e))
     list.append(button)
 }
-function displayModal() {
+function displayModal(e) {
     modalOn("on");
     const closeButton = document.getElementById("close-modal");
     closeButton.addEventListener("click", () =>
     modalOn("off"))
-    displayTaskForm()
+    if (e.target.id==="create-task") displayTaskForm();
+    if (e.target.id==="create-project") displayProjectForm();
 }
 const addIcon = document.getElementById("add-icon");
 addIcon.addEventListener("click", () => {

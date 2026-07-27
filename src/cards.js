@@ -1,5 +1,5 @@
 // Card builder functions
-export { modalOn, populateCard, addDrag, displayTaskForm }
+export { modalOn, populateCard, addDrag, displayTaskForm, displayProjectForm }
 import { projectsList, updateProjectList, updateTaskList, currentProjectIndex, addTask, addCardsToDesk, drag } from "./index.js";
 import { Element, Label, Input, Image, Project, Note, ChecklistNote, DateNote, debounce, throttle } from "./components.js";
 import { format, formatDistance, formatISO, parseISO, getHours, compareAsc } from "date-fns";
@@ -234,6 +234,23 @@ function resetErrors(item1, item2) {
     item1.style.border = "none"
     item2.style.border = "none"
 }
+function displayProjectForm() {
+    buttonWrapper.replaceChildren("");
+    form.id = "project-form";
+    form.method = "dialog";
+    form.replaceChildren("")
+
+    const projNameLabel = new Label({forLink: "proj-title-input", id: "proj-title-label", name: "proj-title-label", text: "Name of Project"}).create()
+    const projNameObj = new Input({type: "text", id: "project-title-input", classes: "proj-form-el", name: "proj-title"})
+    const projName = projNameObj.create()
+
+    
+    const buttonObj = new Element({tag: "button", id: "proj-submit", text: "Create"});
+    const button = buttonObj.create();
+    button.addEventListener("click", (e) => {})
+    form.append(projNameLabel, projName, button)
+}
+
 function displayTaskForm() {
     createButtons()
     
@@ -244,8 +261,7 @@ function displayTaskForm() {
     const inputWrapperObj = new Element({tag: "div", classes: "input-wrapper"})
     const inputWrapper = inputWrapperObj.create()
     
-    const titleLabelObj = new Label(
-        {forLink: "title-input", id: "title-label", name: "title-label", text: "Name of Task"});
+    const titleLabelObj = new Label({forLink: "title-input", id: "title-label", name: "title-label", text: "Name of Task"});
     const titleLabel = titleLabelObj.create()
     const titleInputObj = new Input({type: "text", name: "title", id: "title-input", classes: "task-form-el", required: true});
     console.log(titleInputObj)

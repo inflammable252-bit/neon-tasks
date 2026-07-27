@@ -436,6 +436,12 @@ form.modal-form .input-wrapper {
     grid-auto-flow: row;
 }
 
+form#project-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 div#button-wrapper {
     grid-column: 1/2;
     grid-row: 1/2;
