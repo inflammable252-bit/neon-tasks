@@ -10,7 +10,7 @@ let autoSpread = true;
 let drag = true;
 let mode = "dawn"
 const projectsList = []
-const currentProjectIndex = 0;
+let currentProjectIndex = 0;
 
 const modeSelect = document.getElementById("mode-select");
 const modes = ["night", "dusk", "dawn"];
@@ -34,20 +34,28 @@ dragToggle.addEventListener("change", (e) => {
 function updateProjectList() {
     const list = document.querySelector("#projects-list ul");
     list.replaceChildren("")
-    let counter = 0;
-    projectsList.forEach((item) => {
+    projectsList.forEach((item, index) => {
         // console.log("item: ", item)
         const projectObj = new Element({tag: "li", classes: "project-item", text: item.name})
         const project = projectObj.create();
-        if (counter === currentProjectIndex) project.classList.add("selected-project");
+        if (index === currentProjectIndex) project.classList.add("selected-project");
+        project.addEventListener("click", (e) => {
+            let projectIndex = Array.from(project.parentElement.children).indexOf(project);
+            currentProjectIndex = projectIndex;
+            updateProjectList();
+            updateTaskList()
+            console.log(projectsList[currentProjectIndex])
+            addCardsToDesk(currentProjectIndex)
+        })
         list.append(project);
-        counter++
     })
     const buttonObj = new Element({tag: "button", id: "create-project", text: "Create Project"})
     const button = buttonObj.create();
     button.addEventListener("click", (e) => displayModal(e))
     list.append(button)
 }
+
+
 
 function updateTaskList() {
     const list = document.querySelector("#tasks-list ul");
@@ -98,8 +106,14 @@ function getTask(projectIndex, taskIndex) {
 function updateTask(projectIndex, taskIndex, update) {
     getTask(projectIndex, taskIndex).update(update)
 }
-function deleteTaskOLD(projectIndex, taskIndex) {
-    projectsList[projectIndex].taskList.splice(taskIndex, 1)
+function deleteTask(projectIndex, taskIndex) {
+    const currentTasks = projectsList[projectIndex].taskList;
+    const currentCards = document.querySelectorAll("article.card");
+    console.log(`Deleted ${currentTasks[taskIndex].type}: ${currentTasks[taskIndex].title}!`);
+    delete currentTasks[taskIndex];
+    currentCards[taskIndex].remove()
+    console.log(currentTasks)
+
 }
 function addCardsToDeskOLD(projectIndex) {
     let cards = document.getElementsByClassName("card");
@@ -117,9 +131,14 @@ function addCardsToDeskOLD(projectIndex) {
     console.log(cards)
     if (drag) addDrag(cardWrapper, autoSpread)
 }
-
+function removeEmptyTasks(projectIndex) {
+    projectsList[projectIndex].taskList = (projectsList[projectIndex].taskList).filter((task) => task !== undefined);
+}
 function addCardsToDesk(projectIndex) {
+    removeEmptyTasks(projectIndex);
     const currentProjectTasks = projectsList[projectIndex].taskList;
+    console.log("current: ", currentProjectTasks)
+    cardWrapper.replaceChildren("")
     let counter = 0;
     for (const task of currentProjectTasks) {
         task.createCard()
@@ -165,19 +184,13 @@ addProject("Your Second Project")
 addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "note"})
 addTask(0, {title: "Checklist", description: "Checklist items go here.", dueDate: "2026-07-24", dueTime: "17:00", type: "checklist"})
 addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-24", dueTime: "20:00", timer: true})
+addTask(1, {title: "Your new task", type: "note", text: "what"})
 // updateTask(0, 0, {title: "1st task new name"})
-    
-// addCardsToDesk(currentProjectIndex)
-addCardsToDesk(currentProjectIndex)
-function deleteTask(projectIndex, taskIndex) {
-    const currentTasks = projectsList[projectIndex].taskList;
-    const currentCards = document.querySelectorAll("article.card");
-    console.log(`Deleted ${currentTasks[taskIndex].type}: ${currentTasks[taskIndex].title}!`);
-    delete currentTasks[taskIndex];
-    currentCards[taskIndex].remove()
-    console.log(currentTasks)
 
-}
+
+
+addCardsToDesk(currentProjectIndex)
+
 deleteTask(0, 0)
 
 updateProjectList()

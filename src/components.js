@@ -21,9 +21,6 @@ class Element {
         if (classes) this.element.className = classes;
         if (text) this.element.textContent = text;
     }
-    delete() {
-        this.element.remove()
-    }
 }
 
 class Input extends Element {
@@ -131,9 +128,6 @@ class Note {
         
         cardWrapper.append(card);
         this.size = [card.clientWidth, card.clientHeight];
-    }
-    remove() {
-        console.log(this)
     }
 }
 class ChecklistNote extends Note {
