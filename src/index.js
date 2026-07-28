@@ -2,7 +2,7 @@ import "./style.css"
 import "./reset.css"
 
 export { projectsList, updateProjectList, updateTaskList, currentProjectIndex, drag, addTask, addCardsToDesk }
-import { populateCard, addDrag } from "./cards.js";
+import { populateCard, addDrag, timers, getDue } from "./cards.js";
 import { modalOn, displayProjectForm, displayTaskForm } from "./modal-window.js"
 import { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote } from "./components.js";
 
@@ -24,7 +24,6 @@ const isMobile = window.matchMedia("(pointer: coarse)").matches;
 modeSelect.addEventListener("change", (e) => {
     changeTheme(e.target.value)
     mode = e.target.value;
-    console.log(mode)
 })
 const dragToggle = document.getElementById("drag");
 dragToggle.addEventListener("change", (e) => {
@@ -35,7 +34,6 @@ function updateProjectList() {
     const list = document.querySelector("#projects-list ul");
     list.replaceChildren("")
     projectsList.forEach((item, index) => {
-        // console.log("item: ", item)
         const projectObj = new Element({tag: "li", classes: "project-item", text: item.name})
         const project = projectObj.create();
         if (index === currentProjectIndex) project.classList.add("selected-project");
@@ -112,8 +110,7 @@ function deleteTask(projectIndex, taskIndex) {
     console.log(`Deleted ${currentTasks[taskIndex].type}: ${currentTasks[taskIndex].title}!`);
     delete currentTasks[taskIndex];
     currentCards[taskIndex].remove()
-    console.log(currentTasks)
-
+    // console.log(currentTasks)
 }
 function addCardsToDeskOLD(projectIndex) {
     let cards = document.getElementsByClassName("card");
@@ -134,10 +131,12 @@ function addCardsToDeskOLD(projectIndex) {
 function removeEmptyTasks(projectIndex) {
     projectsList[projectIndex].taskList = (projectsList[projectIndex].taskList).filter((task) => task !== undefined);
 }
+let currentTimer;
 function addCardsToDesk(projectIndex) {
     removeEmptyTasks(projectIndex);
+    timers.length = 0;
+    updateTimers();
     const currentProjectTasks = projectsList[projectIndex].taskList;
-    console.log("current: ", currentProjectTasks)
     cardWrapper.replaceChildren("")
     let counter = 0;
     for (const task of currentProjectTasks) {
@@ -146,15 +145,25 @@ function addCardsToDesk(projectIndex) {
         counter++
     }
     if (drag) addDrag(cardWrapper, autoSpread)    
-    console.log(currentProjectTasks)
 }
 function addCard(task) {
     const cardObj = new Element({tag: "article", classes: `card type-${task.type}`});
-
     const card = cardObj.create();
     populateCard(task, card);
     cardWrapper.append(card);
     task.size = [card.clientWidth, card.clientHeight];
+}
+
+function updateTimers() {
+    clearInterval(currentTimer)
+    currentTimer = setInterval(() => {
+        timers.forEach((set) => {
+            const task = set[0];
+            const timer = set[1]; 
+            timer.textContent = getDue(task).getMsg();
+            timer.style.color = getDue(task).getColor()
+        })
+    }, 5000);
 }
 
 function changeTheme(theme) {
@@ -183,7 +192,7 @@ addProject("Your First Project")
 addProject("Your Second Project")
 addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "note"})
 addTask(0, {title: "Checklist", description: "Checklist items go here.", dueDate: "2026-07-24", dueTime: "17:00", type: "checklist"})
-addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-24", dueTime: "20:00", timer: true})
+addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-28", dueTime: "15:00", timer: true})
 addTask(1, {title: "Your new task", type: "note", text: "what"})
 // updateTask(0, 0, {title: "1st task new name"})
 
@@ -191,7 +200,7 @@ addTask(1, {title: "Your new task", type: "note", text: "what"})
 
 addCardsToDesk(currentProjectIndex)
 
-deleteTask(0, 0)
+// deleteTask(0, 0)
 
 updateProjectList()
 updateTaskList()

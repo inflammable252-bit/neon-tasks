@@ -1,7 +1,9 @@
 // Card builder functions
-export { populateCard, addDrag }
+export { populateCard, addDrag, timers, getDue }
 import { Element, Label, Input, Image, Project, Note, ChecklistNote, DateNote, debounce, throttle } from "./components.js";
 import { format, formatDistance, formatISO, parseISO, compareAsc } from "date-fns";
+
+const timers = [];
 
 function populateCard(task, card) {
     const titleObj = new Element({tag: "h4", classes: "card-header", text: task.title});
@@ -20,6 +22,7 @@ function populateCard(task, card) {
     }
     else card.append(title, createdDate, description, createCardTimeDiv(task, card));
 }
+
 function createCardTimeDiv(task, card) {
     const timeSectionObj = new Element({tag: "div", classes: "card-time-section"})
     const timeSection = timeSectionObj.create();
@@ -49,12 +52,24 @@ function createCardTimeDiv(task, card) {
         timeSection.append(priority)
     }
     if (task.timer) {
+        let dueInfo = getDue(task);
+        const timerEleObj = new Element({tag: "p", classes: "card-timer", text: dueInfo.getMsg()});
+        const timerEle = timerEleObj.create();
+        timers.push([task, timerEle])
+        timerEle.style.color = dueInfo.getColor();
+        timeSection.append(timerEle)
+    }
+    return timeSection;
+}
+
+function getDue(task) {
+    let msg;
+    let color;
+    calcDiffAndColor()
+    function calcDiffAndColor() {
         const dueMsg = "Time left: " + formatDistance(task.created, formatISO(task.due));
-        const pastDueMsg = "Past due: " + formatDistance(task.created, formatISO(task.due));
-        let msg;
-        let color;
+        const pastDueMsg = "Past due: " + formatDistance(new Date(), formatISO(task.due));
         // note: 1 if the first date is after the second, -1 if the first date is before the second or 0 if dates are equal.
-        console.log(task.created, task.due)
         switch (compareAsc(task.created, task.due)) {
             case (1):
                 msg = pastDueMsg;
@@ -68,13 +83,16 @@ function createCardTimeDiv(task, card) {
                     color = "rgba(255, 189, 103, 0.78)";
             break;
         }
-        const timerEleObj = new Element({tag: "p", classes: "card-timer", text: msg});
-        const timerEle = timerEleObj.create();
-        timerEle.style.color = color;
-        timeSection.append(timerEle)
     }
-    return timeSection;
+    function getMsg() {
+        return msg
+    }
+    function getColor() {
+        return color;
+    }
+        return { calcDiffAndColor, getMsg, getColor }
 }
+
 
 // Card drag adapted from:
 // https://srivastavayushmaan1347.medium.com/blog-title-creating-a-draggable-div-element-with-javascript-88f3be51bbf9
