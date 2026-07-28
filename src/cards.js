@@ -67,22 +67,25 @@ function getDue(task) {
     let color;
     calcDiffAndColor()
     function calcDiffAndColor() {
-        const dueMsg = "Time left: " + formatDistance(task.created, formatISO(task.due));
-        const pastDueMsg = "Past due: " + formatDistance(new Date(), formatISO(task.due));
+        let now = new Date()
+        const dueMsg = "Time left: " + formatDistance(formatISO(task.due), now);
+        const pastDueMsg = "Past due: " + formatDistance(now, formatISO(task.due));
         // note: 1 if the first date is after the second, -1 if the first date is before the second or 0 if dates are equal.
-        switch (compareAsc(task.created, task.due)) {
+        switch (compareAsc(now, task.due)) {
             case (1):
                 msg = pastDueMsg;
                 color = "rgba(255,125,125,0.8)";
                 break;
             case (-1):
-                    msg = dueMsg;
-                    break;
+                msg = dueMsg;
+                break;
             case (0):
-                    msg = "Due today"
-                    color = "rgba(255, 189, 103, 0.78)";
-            break;
+                msg = "Due today"
+                color = "rgba(255, 189, 103, 0.78)";
+                break;
         }
+        console.log(compareAsc(task.created, task.due))
+        console.log(getMsg())
     }
     function getMsg() {
         return msg

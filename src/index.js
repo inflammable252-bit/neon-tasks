@@ -163,7 +163,7 @@ function updateTimers() {
             timer.textContent = getDue(task).getMsg();
             timer.style.color = getDue(task).getColor()
         })
-    }, 5000);
+    }, 10000);
 }
 
 function changeTheme(theme) {
@@ -192,7 +192,7 @@ addProject("Your First Project")
 addProject("Your Second Project")
 addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "note"})
 addTask(0, {title: "Checklist", description: "Checklist items go here.", dueDate: "2026-07-24", dueTime: "17:00", type: "checklist"})
-addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-28", dueTime: "15:00", timer: true})
+addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-28", dueTime: "16:00", timer: true})
 addTask(1, {title: "Your new task", type: "note", text: "what"})
 // updateTask(0, 0, {title: "1st task new name"})
 
