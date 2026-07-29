@@ -1,7 +1,7 @@
 import "./style.css"
 import "./reset.css"
 
-export { projectsList, updateProjectList, updateTaskList, currentProjectIndex, drag, addTask, addCardsToDesk }
+export { projectsList, addProject, updateProjectList, updateTaskList, currentProjectIndex, drag, addTask, addCardsToDesk }
 import { populateCard, addDrag, timers, getDue } from "./cards.js";
 import { modalOn, displayProjectForm, displayTaskForm } from "./modal-window.js"
 import { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote } from "./components.js";
@@ -34,7 +34,7 @@ function updateProjectList() {
     const list = document.querySelector("#projects-list ul");
     list.replaceChildren("")
     projectsList.forEach((item, index) => {
-        const projectObj = new Element({tag: "li", classes: "project-item", text: item.name})
+        const projectObj = new Element({tag: "li", classes: "project-item", text: `${item.name} (${item.taskList.length})`})
         const project = projectObj.create();
         if (index === currentProjectIndex) project.classList.add("selected-project");
         project.addEventListener("click", (e) => {
@@ -73,14 +73,14 @@ function updateTaskList() {
 function displayModal(e) {
     modalOn("on");
     const closeButton = document.getElementById("close-modal");
-    closeButton.addEventListener("click", () =>
+    closeButton.addEventListener("click", (e) =>
     modalOn("off"))
-    if (e.target.id==="create-task") displayTaskForm();
+    if (e.target.id==="create-task" || e.target.id ==="add-icon") displayTaskForm();
     if (e.target.id==="create-project") displayProjectForm();
 }
 const addIcon = document.getElementById("add-icon");
-addIcon.addEventListener("click", () => {
-    displayModal()
+addIcon.addEventListener("click", (e) => {
+    displayModal(e)
 })
 const listIcon = document.getElementById("list-icon");
 listIcon.addEventListener("click", () => toggleSidebar())
@@ -112,22 +112,6 @@ function deleteTask(projectIndex, taskIndex) {
     currentCards[taskIndex].remove()
     // console.log(currentTasks)
 }
-function addCardsToDeskOLD(projectIndex) {
-    let cards = document.getElementsByClassName("card");
-    const currentProj = projectsList[currentProjectIndex].taskList;
-    if (cards.length === currentProj) return;
-    if (cards.length === 0) {
-        for (const task of currentProj) {
-            addCard(task)
-        }
-    }
-    if (currentProj.length > cards.length) {
-        let newIndex = cards.length;
-        addCard(currentProj[newIndex])
-    }
-    console.log(cards)
-    if (drag) addDrag(cardWrapper, autoSpread)
-}
 function removeEmptyTasks(projectIndex) {
     projectsList[projectIndex].taskList = (projectsList[projectIndex].taskList).filter((task) => task !== undefined);
 }
@@ -153,7 +137,6 @@ function addCard(task) {
     cardWrapper.append(card);
     task.size = [card.clientWidth, card.clientHeight];
 }
-
 function updateTimers() {
     clearInterval(currentTimer)
     currentTimer = setInterval(() => {
@@ -163,7 +146,7 @@ function updateTimers() {
             timer.textContent = getDue(task).getMsg();
             timer.style.color = getDue(task).getColor()
         })
-    }, 10000);
+    }, 45000);
 }
 
 function changeTheme(theme) {

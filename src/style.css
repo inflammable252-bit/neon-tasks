@@ -191,13 +191,14 @@ aside#sidebar details#projects-list {
     }
 aside#sidebar ul {
         list-style-type: none;
+        padding-left: 0.2em;
     }
 aside#sidebar li.selected-project {
         background-color: #ffffff31;
         border-radius: 6px;
     }
     li {
-        padding-left: 0.5em;
+        padding-left: 0.4em;
     }
 @media (min-width: 768px) {
     div#header-right div#input-wrapper {
@@ -251,7 +252,7 @@ div.menu-buttons-wrapper img {
     aside#sidebar, aside#sidebar.show {
         position: static;
         width: calc(250px + 1vw);
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         background-color: color-mix(in srgb, var(--theme-current-color), #ffffff71 40%);
         details {
         display: block;
@@ -275,7 +276,6 @@ main section#card-wrapper {
 }
 .card {
     --pad: 0.1em 0.3em;
-
     overflow: auto;
     height: 175px;
     width: 150px;
@@ -396,15 +396,12 @@ dialog#modal-window:open {
     grid-template-columns: auto;
     grid-auto-rows: auto;
     width: calc(300px + 1vw);
-    /* position: absolute;
-    top: 0;
-    left: 0; */
     background-color: var(--bg-current-color);
     border-radius: 12px;
     border: none;
     box-shadow: calc(2px + 0.4vw) calc(2px + 0.4vw) color-mix(in srgb, var(--theme-current-op), #FFF 15%);
 }
-.task-form-el {
+.task-form-el, form.modal-form input {
     width: min-content;
     border-radius: 8px;
     border: none;
@@ -429,7 +426,7 @@ dialog img#close-modal:hover {
     border: 2px solid #ffffffbb;
 }
 
-form.modal-form .input-wrapper {
+form.modal-form, form.modal-form .input-wrapper {
     color: #FFF;
     display: grid;
     grid-template-columns: 1fr;
@@ -565,4 +562,18 @@ button#submit {
 button#create-project, button#create-task {
     background-color: var(--theme-current-color);
     color: #FFF;
+}
+
+form#project-form {
+    display: flex;
+    gap: 1vw;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    label {
+        font-size: 1.1em;
+    }
+    button {
+        margin: 0.5em 0 1em;
+    }
 }

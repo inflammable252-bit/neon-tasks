@@ -1,5 +1,5 @@
 export { createButtons, modalOn, displayTaskForm, displayProjectForm }
-import { projectsList, updateProjectList, updateTaskList, currentProjectIndex, drag, addTask, addCardsToDesk } from "./index.js"
+import { projectsList, addProject, updateProjectList, updateTaskList, currentProjectIndex, drag, addTask, addCardsToDesk } from "./index.js"
 import { Element, Image, Input, Label, Project, Note, ChecklistNote } from "./components.js"
 
 const modalWindow = document.getElementById("modal-window");
@@ -49,7 +49,7 @@ function createButtons() {
     buttonWrapper.replaceChildren(noteButton, checklistButton, dateButton)
     return buttonWrapper;
 }
-function createSubmitButton() {
+function createTaskSubmitButton() {
     const buttonObj = new Element({tag: "button", id: "submit", text: "Create"});
     const button = buttonObj.create();
     button.addEventListener("click", (e) => {
@@ -104,12 +104,21 @@ function displayProjectForm() {
     const projNameLabel = new Label({forLink: "proj-title-input", id: "proj-title-label", name: "proj-title-label", text: "Name of Project"}).create()
     const projNameObj = new Input({type: "text", id: "project-title-input", classes: "proj-form-el", name: "proj-title"})
     const projName = projNameObj.create()
+    projName.setAttribute("autocomplete", "off")
+    form.append(projNameLabel, projName, createProjectSubmitButton())
+}
 
-    
-    const buttonObj = new Element({tag: "button", id: "proj-submit", text: "Create"});
+function createProjectSubmitButton() {
+    const buttonObj = new Element({tag: "button", id: "submit", text: "Create"});
     const button = buttonObj.create();
-    button.addEventListener("click", (e) => {})
-    form.append(projNameLabel, projName, button)
+    button.addEventListener("click", (e) => {
+        let name = form["proj-title"].value;
+        console.log(name)
+        addProject(name)
+        updateProjectList()
+    })
+
+    return button
 }
 
 function displayTaskForm() {
@@ -135,7 +144,7 @@ function displayTaskForm() {
     const descriptionInput = descriptionInputObj.create();
     descriptionInput.name= "description";
 
-    inputWrapper.replaceChildren(titleLabel, titleInput, descriptionLabel, descriptionInput, buildDue(), buildPrioritySlider(), createSubmitButton())
+    inputWrapper.replaceChildren(titleLabel, titleInput, descriptionLabel, descriptionInput, buildDue(), buildPrioritySlider(), createTaskSubmitButton())
     form.append(inputWrapper)
 }
 function buildDue() {

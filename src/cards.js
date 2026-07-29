@@ -84,8 +84,6 @@ function getDue(task) {
                 color = "rgba(255, 189, 103, 0.78)";
                 break;
         }
-        console.log(compareAsc(task.created, task.due))
-        console.log(getMsg())
     }
     function getMsg() {
         return msg
