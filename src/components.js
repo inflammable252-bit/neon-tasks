@@ -74,7 +74,7 @@ class Image  {
     }
     update({id, classes, src, alt, srcsets, sizes}) {
         if (id) this.img.id = id;
-        if (classes) this.img.classes = classes;
+        if (classes) this.img.className = classes;
         if (src) this.img.src = src;
         if (alt) this.img.alt = alt;
         if (srcsets) this.img.srcset = srcsets;

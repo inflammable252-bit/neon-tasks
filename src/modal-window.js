@@ -1,5 +1,5 @@
-export { createButtons, modalOn, displayTaskForm, displayProjectForm }
-import { projectsList, addProject, updateProjectList, updateTaskList, currentProjectIndex, drag, addTask, addCardsToDesk } from "./index.js"
+export { createButtons, modalOn, displayDelete as confirmDelete, displayTaskForm, displayProjectForm }
+import { projectsList, addProject, updateProjectList, deleteTask, updateTaskList, currentProjectIndex, drag, addTask, addCardsToDesk, addCard, deleteActiveTask } from "./index.js"
 import { Element, Image, Input, Label, Project, Note, ChecklistNote } from "./components.js"
 
 const modalWindow = document.getElementById("modal-window");
@@ -54,46 +54,47 @@ function createTaskSubmitButton() {
     const button = buttonObj.create();
     button.addEventListener("click", (e) => {
         e.preventDefault();
-        if (form.title.value && form.description.value) {
-            addTask(currentProjectIndex, {
-                title: form.title.value, 
-                description: form.description.value, 
-                dueDate: form["due-date-input"]?.value,
-                dueTime: form["due-time-input"]?.value,
-                priority: currentPriority,
-                timer: form.timer?.value,
-                type: select,
-             })
-        }
-        if (!errorCheck(form.title, form.description)) return
-        form.reset()
-        addCardsToDesk(currentProjectIndex)
+        const regularFields = [form.title, form.description];
+        const dateFields = [...regularFields, form["due-date-input"], form["due-time-input"]]
+        let checkFields;
+        select === "date" ? checkFields = dateFields : checkFields = regularFields;
+        if (!errorCheck(checkFields)) return;
+        addTask(currentProjectIndex, {
+            title: form.title.value, 
+            description: form.description.value, 
+            dueDate: form["due-date-input"]?.value,
+            dueTime: form["due-time-input"]?.value,
+            priority: currentPriority,
+            timer: form.timer?.value,
+            type: select,
+        })
+        addCard()
         updateProjectList()
         updateTaskList()
+        form.reset()
         modalWindow.close()
     })
     return button;
 }
-function errorCheck(item1, item2) {
+function errorCheck([...items]) {
     const color = "2px solid rgba(255, 0, 0, 0.61)";
     let result;
-    if (!item1.value) {
-            item1.style.border = color;
+    items.forEach((item) => {
+        if (!item.value) {
+            item.style.border = color;
             result = false;
         }
-    if (!item2.value) {
-        item2.style.border = color;
-        result = false;
-    }
-    else {
-        resetErrors(item1, item2)
+        else {
+        resetErrors(items)
         result = true;
-    }
+        }
+    })
     return result
 }
-function resetErrors(item1, item2) {
-    item1.style.border = "none"
-    item2.style.border = "none"
+function resetErrors([...items]) {
+    items.forEach((item) => {
+    item.style.border = "none"
+    })
 }
 function displayProjectForm() {
     buttonWrapper.replaceChildren("");
@@ -112,12 +113,13 @@ function createProjectSubmitButton() {
     const buttonObj = new Element({tag: "button", id: "submit", text: "Create"});
     const button = buttonObj.create();
     button.addEventListener("click", (e) => {
+        e.preventDefault()
         let name = form["proj-title"].value;
-        console.log(name)
+        if (!name) return;
         addProject(name)
         updateProjectList()
+        modalWindow.close()
     })
-
     return button
 }
 
@@ -217,4 +219,23 @@ function buildPrioritySlider() {
 
     priorityAndTimerWrapper.append(priorityLabel, priority, priorityMarkers, priorityMarkerLabels, timerCheckLabel, timerCheck);
     return priorityAndTimerWrapper;
+}
+
+function displayDelete() {
+    buttonWrapper.replaceChildren("");
+    form.replaceChildren("");
+    form.id = "confirm-delete-form";
+    const confirmText = new Element({tag: "p", classes: "confirm-text", text: "Delete?"}).create();
+    const deleteButton = new Element({tag: "button", text: "Delete", id: "delete-button"}).create();
+    const cancelButton = new Element({tag: "button", text: "Cancel", id: "cancel-button"}).create();
+    const buttons = new Element({tag: "div", id: "delete-buttons-wrapper"}).create();
+    deleteButton.addEventListener("click", (e) => {
+        e.preventDefault()
+        deleteActiveTask()
+        modalWindow.close()
+    })
+    cancelButton.addEventListener("click", () => modalWindow.close())
+
+    buttons.append(deleteButton, cancelButton);
+    form.append(confirmText, buttons)
 }
