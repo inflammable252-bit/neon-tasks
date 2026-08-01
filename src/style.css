@@ -577,7 +577,7 @@ button {
     justify-self: center;
     padding: 0 1em;
 }
-button#submit, div#delete-buttons-wrapper button {
+button#submit, div#delete-buttons-wrapper button, button#cancel-button {
     background-color: var(--theme-current-accent);
     border: 2px solid var(--theme-dawn-font);
     font-size: 1.1em;
@@ -608,13 +608,14 @@ form#confirm-delete-form {
     align-items: center;
     padding: 0 0 1em;
     gap: clamp(0.75em, 1vw, 1.75em);
-    p {
-        font-family: var(--p-strong);
-        font-size: 1.2em;
-        font-weight: 500;
-        margin-top: calc(-10%)
-    }
 }
+form#confirm-delete-form p, form#error-no-form p {
+    font-family: var(--p-strong);
+    font-size: 1.2em;
+    font-weight: 500;
+    margin-top: calc(-10%)
+}
+
 div#delete-buttons-wrapper {
     display: flex;
     gap: clamp(0.2em, 1vw, 1em);
@@ -623,9 +624,9 @@ div#delete-buttons-wrapper {
     button {
         margin-top: 0;
     }
-    #cancel-button {
-        background-color: color-mix(in srgb, var(--theme-current-accent), #FFF 75%)
-    }
+}
+dialog#modal-window #cancel-button {
+    background-color: color-mix(in srgb, var(--theme-current-accent), #FFF 75%)
 }
 article.selected-card, article.user-selected-card {
     z-index: 15;
@@ -634,4 +635,14 @@ article.selected-card, article.user-selected-card {
 }
 article.user-selected-card {
     outline: 3px solid #ffffffc7;
+}
+form#error-no-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: calc(1.2rem + 0.5vw) calc(0.5em + 0.5vw);
+    button {
+        margin-top: calc(0.5rem + 0.5vw);
+        justify-self: start;
+    }
 }

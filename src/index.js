@@ -3,7 +3,7 @@ import "./reset.css"
 
 export { projectsList, addProject, updateProjectList, deleteTask, updateTaskList, currentProjectIndex, drag, addTask, addCard, addCardsToDesk, deleteActiveTask, deleteActiveProject, projectOrTask, activeIndexToDelete, removeEmptyItems }
 import { populateCard, addDrag, timers, getDue } from "./cards.js";
-import { modalOn, displayDelete, displayProjectForm, displayTaskForm } from "./modal-window.js"
+import { modalOn, displayDelete, displayProjectForm, displayTaskForm, zeroProjectError } from "./modal-window.js"
 import { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote } from "./components.js";
 import closeIcon from "./images/close-svgrepo-com.svg";
 
@@ -96,12 +96,13 @@ let activeIndexToDelete;
 function addDeleteButton(fromList) {
     const deleteButton = new Image({classes: `delete-icon delete-${fromList}`, src: closeIcon, alt: "Delete task"}).create();
     deleteButton.addEventListener("click", (e) => {
-        displayModal(e)
         let ulParent = e.target.parentElement.parentElement.parentElement;
         ulParent.id === "tasks-list" ? projectOrTask = "task" : projectOrTask = "project";
         let liItems = (e.target.parentElement).parentElement.children;
         let liItemsArr = Array.from(liItems);
         activeIndexToDelete = liItemsArr.indexOf(e.target.parentElement)
+        console.log("projectOrTask swapped to ", projectOrTask)
+        displayModal(e)
     })
     return deleteButton
 }

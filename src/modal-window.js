@@ -1,4 +1,4 @@
-export { createButtons, modalOn, displayTaskForm, displayProjectForm, displayDelete }
+export { createButtons, modalOn, displayTaskForm, displayProjectForm, displayDelete, zeroProjectError }
 import { projectsList, addProject, updateProjectList, deleteTask, updateTaskList, currentProjectIndex, drag, addTask, addCardsToDesk, addCard, deleteActiveTask, deleteActiveProject, projectOrTask, activeIndexToDelete, removeEmptyItems } from "./index.js"
 import { Element, Image, Input, Label, Project, Note, ChecklistNote } from "./components.js"
 
@@ -222,6 +222,10 @@ function buildPrioritySlider() {
 }
 
 function displayDelete() {
+    if (projectOrTask === "project" && projectsList.length === 1) {
+        zeroProjectError()
+        return;
+    }
     buttonWrapper.replaceChildren("");
     form.replaceChildren("");
     form.id = "confirm-delete-form";
@@ -231,7 +235,6 @@ function displayDelete() {
     const buttons = new Element({tag: "div", id: "delete-buttons-wrapper"}).create();
     deleteButton.addEventListener("click", (e) => {
         e.preventDefault();
-        console.log(projectOrTask);
         (projectOrTask === "task" && deleteActiveTask());
         (projectOrTask === "project" && deleteActiveProject());
         removeEmptyItems();
@@ -245,4 +248,18 @@ function displayDelete() {
 
     buttons.append(deleteButton, cancelButton);
     form.append(confirmText, buttons)
+}
+function zeroProjectError() {
+    console.log("Displaying error")
+    buttonWrapper.replaceChildren("");
+    form.replaceChildren("");
+    form.id = "error-no-form";
+    const errorText = new Element({tag: "p", classes: "confirm-text", text: "Create a new project before deleting the current project."}).create();
+    const closeButton = new Element({tag: "button", text: "Close", id: "cancel-button"}).create();
+    closeButton.addEventListener("click", (e) => {
+        e.preventDefault()
+        modalWindow.close()
+    })
+
+    form.append(errorText, closeButton)
 }
