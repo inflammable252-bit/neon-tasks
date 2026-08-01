@@ -138,7 +138,7 @@ function deleteProject(projectIndex) {
     delete projectsList[projectIndex];
     if (projectIndex === 0) currentProjectIndex = 0;
     else currentProjectIndex--
-    console.log("new: ", currentProjectIndex)
+    // console.log("new: ", currentProjectIndex)
 }
 function deleteActiveProject() {
     deleteProject(activeIndexToDelete)
@@ -238,7 +238,8 @@ addProject("Your First Project")
 addProject("Your Second Project")
 addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "note"})
 addTask(0, {title: "Checklist", description: ["Laundry", "Vaccuum", "Clean bathroom"], dueDate: "2026-07-24", dueTime: "17:00", type: "checklist"})
-addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-28", dueTime: "16:00", timer: true})
+addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-28", dueTime: "16:00", timer: "on"})
+addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-28", dueTime: "16:00", timer: "off"})
 addTask(1, {title: "Your new task", type: "note", text: "what"})
 // updateTask(0, 0, {title: "1st task new name"})
 

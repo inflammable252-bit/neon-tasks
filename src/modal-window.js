@@ -71,8 +71,9 @@ function createTaskSubmitButton() {
                 break;
         }
         if (!errorCheck(checkFields)) return;
-        const checklistItems = document.querySelectorAll("p.card-checklist-item");
-        if ((select==="checklist") && !checklistItems) {
+        const checklistItems = document.querySelectorAll("dialog p.card-checklist-item");
+        console.log("check ", checklistItems)
+        if ((select==="checklist") && checklistItems.length === 0) {
             form.description.style.border = "2px solid rgba(255, 0, 0, 0.61)";
             return
         }
@@ -86,14 +87,17 @@ function createTaskSubmitButton() {
         else {
             taskDescription = form.description.value
         }
-        
+        let timerCheck;
+        if (select==="date") {
+            ((form["timer"].checked) && (timerCheck = "on"));
+        }
         addTask(currentProjectIndex, {
             title: form.title.value, 
             description: taskDescription, 
             dueDate: form["due-date-input"]?.value,
             dueTime: form["due-time-input"]?.value,
             priority: currentPriority,
-            timer: form.timer?.value,
+            timer: timerCheck || undefined,
             type: select,
         })
         addCard()
@@ -106,23 +110,18 @@ function createTaskSubmitButton() {
 }
 function errorCheck([...items]) {
     const color = "2px solid rgba(255, 0, 0, 0.61)";
-    let result;
+    const result = [];
     items.forEach((item) => {
         if (!item.value) {
             item.style.border = color;
-            result = false;
+            result.push(false)
         }
         else {
-        resetErrors(items)
-        result = true;
+        item.style.border = "none"
+            result.push(true)
         }
     })
-    return result
-}
-function resetErrors([...items]) {
-    items.forEach((item) => {
-    item.style.border = "none"
-    })
+    return result.every((item) => item === true)
 }
 function displayProjectForm() {
     buttonWrapper.replaceChildren("");
@@ -158,10 +157,9 @@ function displayTaskForm() {
     const inputWrapperObj = new Element({tag: "div", classes: "input-wrapper"})
     const inputWrapper = inputWrapperObj.create()
 
-    const titleLabelObj = new Label({forLink: "title-input", id: "title-label", name: "title-label", text: "Name of Task"});
+    const titleLabelObj = new Label({forLink: "title-input", id: "title-label", name: "title-label", text: "Name of Task*"});
     const titleLabel = titleLabelObj.create()
     const titleInputObj = new Input({type: "text", name: "title", id: "title-input", classes: "task-form-el", required: true});
-    console.log(titleInputObj)
     const titleInput = titleInputObj.create();
     inputWrapper.replaceChildren(titleLabel, titleInput, buildDescription(), buildDue(), buildPrioritySlider(), createTaskSubmitButton())
     form.append(inputWrapper)
@@ -267,6 +265,7 @@ function buildPrioritySlider() {
     const timerCheckLabel = timerCheckLabelObj.create();
     const timerCheckObj = new Input({type: "checkbox", name: "timer", id: "timer-check", value: "on"});
     const timerCheck = timerCheckObj.create();
+    console.log("timerCheck ", timerCheck)
 
     priorityAndTimerWrapper.append(priorityLabel, priority, priorityMarkers, priorityMarkerLabels, timerCheckLabel, timerCheck);
     return priorityAndTimerWrapper;
@@ -301,7 +300,6 @@ function displayDelete() {
     form.append(confirmText, buttons)
 }
 function zeroProjectError() {
-    console.log("Displaying error")
     buttonWrapper.replaceChildren("");
     form.replaceChildren("");
     form.id = "error-no-form";
