@@ -179,6 +179,7 @@ aside#sidebar details {
 aside#sidebar.show {
     width: calc(200px + 1vw);
     position: absolute;
+    z-index: 40;
     details {
         display: block;
     }
@@ -193,7 +194,7 @@ aside#sidebar ul {
         list-style-type: none;
         padding-left: 0.3em;
     }
-aside#sidebar li.selected-project {
+aside#sidebar li.selected-project, aside#sidebar li.task-item:focus {
         background-color: #ffffff31;
         border-radius: 6px;
     }
@@ -245,7 +246,7 @@ nav {
     grid-column: 1/-1;
     height: 50px;
     background-color: var(--theme-current-color);
-    z-index: 10;
+    z-index: 50;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -585,6 +586,7 @@ button#submit, div#delete-buttons-wrapper button {
 button#create-project, button#create-task {
     background-color: var(--theme-current-color);
     color: #FFF;
+    margin: 0.25em 1em;
 }
 
 form#project-form {
@@ -625,8 +627,11 @@ div#delete-buttons-wrapper {
         background-color: color-mix(in srgb, var(--theme-current-accent), #FFF 75%)
     }
 }
-article.selected-card {
+article.selected-card, article.user-selected-card {
     z-index: 15;
-    height: 375px;
-    width: 300px;
+    height: 325px;
+    width: 275px;
+}
+article.user-selected-card {
+    outline: 3px solid #ffffffc7;
 }

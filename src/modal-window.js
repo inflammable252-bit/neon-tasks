@@ -1,5 +1,5 @@
-export { createButtons, modalOn, displayDelete as confirmDelete, displayTaskForm, displayProjectForm }
-import { projectsList, addProject, updateProjectList, deleteTask, updateTaskList, currentProjectIndex, drag, addTask, addCardsToDesk, addCard, deleteActiveTask } from "./index.js"
+export { createButtons, modalOn, displayTaskForm, displayProjectForm, displayDelete }
+import { projectsList, addProject, updateProjectList, deleteTask, updateTaskList, currentProjectIndex, drag, addTask, addCardsToDesk, addCard, deleteActiveTask, deleteActiveProject, projectOrTask, activeIndexToDelete, removeEmptyItems } from "./index.js"
 import { Element, Image, Input, Label, Project, Note, ChecklistNote } from "./components.js"
 
 const modalWindow = document.getElementById("modal-window");
@@ -230,11 +230,18 @@ function displayDelete() {
     const cancelButton = new Element({tag: "button", text: "Cancel", id: "cancel-button"}).create();
     const buttons = new Element({tag: "div", id: "delete-buttons-wrapper"}).create();
     deleteButton.addEventListener("click", (e) => {
-        e.preventDefault()
-        deleteActiveTask()
+        e.preventDefault();
+        console.log(projectOrTask);
+        (projectOrTask === "task" && deleteActiveTask());
+        (projectOrTask === "project" && deleteActiveProject());
+        removeEmptyItems();
+        updateProjectList()
         modalWindow.close()
     })
-    cancelButton.addEventListener("click", () => modalWindow.close())
+    cancelButton.addEventListener("click", (e) => {
+        e.preventDefault()
+        modalWindow.close()
+    })
 
     buttons.append(deleteButton, cancelButton);
     form.append(confirmText, buttons)

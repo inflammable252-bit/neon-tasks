@@ -1,16 +1,16 @@
 import "./style.css"
 import "./reset.css"
 
-export { projectsList, addProject, updateProjectList, deleteTask, updateTaskList, currentProjectIndex, drag, addTask, addCard, addCardsToDesk, deleteActiveTask }
+export { projectsList, addProject, updateProjectList, deleteTask, updateTaskList, currentProjectIndex, drag, addTask, addCard, addCardsToDesk, deleteActiveTask, deleteActiveProject, projectOrTask, activeIndexToDelete, removeEmptyItems }
 import { populateCard, addDrag, timers, getDue } from "./cards.js";
-import { modalOn, confirmDelete, displayProjectForm, displayTaskForm } from "./modal-window.js"
+import { modalOn, displayDelete, displayProjectForm, displayTaskForm } from "./modal-window.js"
 import { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote } from "./components.js";
 import closeIcon from "./images/close-svgrepo-com.svg";
 
 let autoSpread = true;
 let drag = true;
 let mode = "dawn"
-const projectsList = []
+let projectsList = []
 let currentProjectIndex = 0;
 
 const modeSelect = document.getElementById("mode-select");
@@ -35,7 +35,7 @@ function updateProjectList() {
     const list = document.querySelector("#projects-list ul");
     list.replaceChildren("")
     projectsList.forEach((item, index) => {
-        const liObj = new Element({tag: "li", classes: `project-item ${index}`})
+        const liObj = new Element({tag: "li", classes: `project-item project-${index}`})
         const li = liObj.create();
         li.tabIndex = 0;
         if (index === currentProjectIndex) li.classList.add("selected-project");
@@ -45,7 +45,6 @@ function updateProjectList() {
             currentProjectIndex = projectIndex;
             updateProjectList();
             updateTaskList()
-            console.log(projectsList[currentProjectIndex])
             addCardsToDesk(currentProjectIndex)
         })
         li.append(addDeleteButton("project"), project)
@@ -57,12 +56,13 @@ function updateProjectList() {
     list.append(button)
 }
 function updateTaskList() {
+    console.log("Creating ", "index ", currentProjectIndex, projectsList)
     const list = document.querySelector("#tasks-list ul");
     list.replaceChildren("")
     const activeProject = projectsList[currentProjectIndex];
     const activeTasks = activeProject.getTasks();
     activeTasks.forEach((item, index) => {
-        const liObj = new Element({tag: "li", classes: `task-item ${index}`});
+        const liObj = new Element({tag: "li", classes: `task-item task-${index}`});
         const li = liObj.create();
         li.tabIndex = 0;
         const task = new Element({tag: "p", classes: "task-item-text", text: item.title}).create();
@@ -74,41 +74,37 @@ function updateTaskList() {
     button.addEventListener("click", (e) => displayModal(e))
     list.append(button)
    
-    const cards = document.querySelectorAll("article.card");
     list.addEventListener("focus", (e) => {
+        if (e.target.tagName === "BUTTON") return;
+        let cards = document.querySelectorAll("article.card");
         const liIndex = Array.from(list.children).indexOf(e.target);
-        removeEmptyTasks(currentProjectIndex);
+        removeEmptyItems();
         cards[liIndex].classList.add("selected-card")
     }, true)
     list.addEventListener("blur", (e) => {
+        if (e.target.tagName === "BUTTON") return;
+        let cards = document.querySelectorAll("article.card");
         const liIndex = Array.from(list.children).indexOf(e.target);
-        removeEmptyTasks(currentProjectIndex);
+        removeEmptyItems();
         cards[liIndex].classList.remove("selected-card")
     }, true)
 }
 
-function taskSelectEvents() {
-
-}
-
-let activeTaskIndex;
+let projectOrTask;
+let activeIndexToDelete;
 
 function addDeleteButton(fromList) {
     const deleteButton = new Image({classes: `delete-icon delete-${fromList}`, src: closeIcon, alt: "Delete task"}).create();
     deleteButton.addEventListener("click", (e) => {
         displayModal(e)
+        let ulParent = e.target.parentElement.parentElement.parentElement;
+        ulParent.id === "tasks-list" ? projectOrTask = "task" : projectOrTask = "project";
         let liItems = (e.target.parentElement).parentElement.children;
         let liItemsArr = Array.from(liItems);
-        activeTaskIndex = liItemsArr.indexOf(e.target.parentElement)
+        activeIndexToDelete = liItemsArr.indexOf(e.target.parentElement)
     })
     return deleteButton
 }
-function deleteActiveTask() {
-    deleteTask(currentProjectIndex, activeTaskIndex)
-    console.log(activeTaskIndex)
-    updateTaskList()
-}
-
 function displayModal(e) {
     modalOn("on");
     const closeButton = document.getElementById("close-modal");
@@ -116,7 +112,7 @@ function displayModal(e) {
     modalOn("off"))
     if (e.target.id==="create-task" || e.target.id ==="add-icon") displayTaskForm();
     if (e.target.id==="create-project") displayProjectForm();
-    if (e.target.classList.contains("delete-icon")) confirmDelete();
+    if (e.target.classList.contains("delete-icon")) displayDelete();
 }
 const addIcon = document.getElementById("add-icon");
 addIcon.addEventListener("click", (e) => {
@@ -133,7 +129,18 @@ function addProject(projectName) {
     projectsList.push(newProject)
 }
 function deleteProject(projectIndex) {
-    projectsList.splice(projectIndex, 1)
+    removeEmptyItems();
+    console.log(`Deleted project: ${projectsList[projectIndex].name}!`);
+    delete projectsList[projectIndex];
+    if (projectIndex === 0) currentProjectIndex = 0;
+    else currentProjectIndex--
+    console.log("new: ", currentProjectIndex)
+}
+function deleteActiveProject() {
+    deleteProject(activeIndexToDelete)
+    removeEmptyItems()
+    updateTaskList()
+    addCardsToDesk(currentProjectIndex)
 }
 function addTask(projectIndex, task) {
     projectsList[projectIndex].addTaskToList(task)
@@ -145,27 +152,36 @@ function updateTask(projectIndex, taskIndex, update) {
     getTask(projectIndex, taskIndex).update(update)
 }
 function deleteTask(projectIndex, taskIndex) {
-    removeEmptyTasks(currentProjectIndex);
+    removeEmptyItems();
     const currentTasks = projectsList[projectIndex].taskList;
     const currentCards = document.querySelectorAll("article.card");
     console.log(`Deleted ${currentTasks[taskIndex].type}: ${currentTasks[taskIndex].title}!`);
     delete currentTasks[taskIndex];
     currentCards[taskIndex].remove()
-    // console.log(currentTasks)
 }
-function removeEmptyTasks(projectIndex) {
-    projectsList[projectIndex].taskList = (projectsList[projectIndex].taskList).filter((task) => task !== undefined);
+function deleteActiveTask() {
+    deleteTask(currentProjectIndex, activeIndexToDelete)
+    console.log(activeIndexToDelete)
+    updateTaskList()
+}
+function removeEmptyItems() {
+    if (projectsList[currentProjectIndex]) projectsList[currentProjectIndex].taskList = projectsList[currentProjectIndex].taskList.filter((task) => task !== undefined);
+    projectsList = projectsList.filter((project) => project !== undefined)
 }
 let currentTimer;
 function addCardsToDesk(projectIndex) {
-    removeEmptyTasks(projectIndex);
+    removeEmptyItems();
     timers.length = 0;
     updateTimers();
     const currentProjectTasks = projectsList[projectIndex].taskList;
     cardWrapper.replaceChildren("")
     let counter = 0;
     for (const task of currentProjectTasks) {
-        task.createCard()
+        try {
+            task.createCard()
+        } catch (error) {
+            console.log("No task found")
+        }
         task.assignedIndex = counter;
         counter++
     }

@@ -126,6 +126,10 @@ class Note {
 
         populateCard(this, card);
         
+        card.addEventListener("dblclick", () => {
+            card.classList.toggle("user-selected-card")
+        })
+
         cardWrapper.append(card);
         this.size = [card.clientWidth, card.clientHeight];
     }
@@ -169,6 +173,7 @@ class Project {
         this.taskList.push(newTask);
     }
     getTasks() {
+        if (this.taskList)
         return this.taskList
     }
 }
