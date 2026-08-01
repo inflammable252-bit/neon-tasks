@@ -127,6 +127,7 @@ class Note {
         populateCard(this, card);
         
         card.addEventListener("dblclick", () => {
+            console.log("clicked")
             card.classList.toggle("user-selected-card")
         })
 

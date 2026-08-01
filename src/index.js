@@ -3,7 +3,7 @@ import "./reset.css"
 
 export { projectsList, addProject, updateProjectList, deleteTask, updateTaskList, currentProjectIndex, drag, addTask, addCard, addCardsToDesk, deleteActiveTask, deleteActiveProject, projectOrTask, activeIndexToDelete, removeEmptyItems }
 import { populateCard, addDrag, timers, getDue } from "./cards.js";
-import { modalOn, displayDelete, displayProjectForm, displayTaskForm, zeroProjectError } from "./modal-window.js"
+import { modalOn, displayDelete, displayProjectForm, displayTaskForm, zeroProjectError, createButtons } from "./modal-window.js"
 import { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote } from "./components.js";
 import closeIcon from "./images/close-svgrepo-com.svg";
 
@@ -111,7 +111,10 @@ function displayModal(e) {
     const closeButton = document.getElementById("close-modal");
     closeButton.addEventListener("click", (e) =>
     modalOn("off"))
-    if (e.target.id==="create-task" || e.target.id ==="add-icon") displayTaskForm();
+    if (e.target.id==="create-task" || e.target.id ==="add-icon") {
+        createButtons()
+        displayTaskForm()
+    }
     if (e.target.id==="create-project") displayProjectForm();
     if (e.target.classList.contains("delete-icon")) displayDelete();
 }
@@ -181,6 +184,7 @@ function addCardsToDesk(projectIndex) {
         try {
             task.createCard()
         } catch (error) {
+            console.log(error)
             console.log("No task found")
         }
         task.assignedIndex = counter;
@@ -192,10 +196,7 @@ function addCard() {
     const taskList = projectsList[currentProjectIndex].taskList
     const task = taskList[taskList.length-1];
     console.log(taskList)
-    const cardObj = new Element({tag: "article", classes: `card type-${task.type}`});
-    const card = cardObj.create();
-    populateCard(task, card);
-    cardWrapper.append(card);
+    cardWrapper.append(task.createCard());
     updateTimers()
     if (drag) addDrag(cardWrapper, autoSpread);
 }
@@ -236,7 +237,7 @@ function changeTheme(theme) {
 addProject("Your First Project")
 addProject("Your Second Project")
 addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "note"})
-addTask(0, {title: "Checklist", description: "Checklist items go here.", dueDate: "2026-07-24", dueTime: "17:00", type: "checklist"})
+addTask(0, {title: "Checklist", description: ["Laundry", "Vaccuum", "Clean bathroom"], dueDate: "2026-07-24", dueTime: "17:00", type: "checklist"})
 addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-28", dueTime: "16:00", timer: true})
 addTask(1, {title: "Your new task", type: "note", text: "what"})
 // updateTask(0, 0, {title: "1st task new name"})
@@ -247,3 +248,5 @@ addCardsToDesk(currentProjectIndex)
 
 updateProjectList()
 updateTaskList()
+
+console.log(JSON.stringify(projectsList))

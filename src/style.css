@@ -325,7 +325,7 @@ main section#card-wrapper {
         font-size: 0.7em;
         color: #ffffff98;
     }
-    p.card-text {
+    p.card-text, ul.card-checklist {
         background-color: #ffffff10;
         text-overflow: ellipsis;
         border-radius: 4px;
@@ -433,6 +433,17 @@ dialog#modal-window:open {
 }
 textarea.task-form-el {
     width: 100%;
+}
+div.checklist-items {
+    p {
+        padding-left: 0.5em;
+    }
+    p:last-child {
+        padding-bottom: 0.5em;
+    }
+    p:before {
+        content: "- "
+    }
 }
 dialog img#close-modal {
     grid-column: 1/2;
@@ -644,5 +655,19 @@ form#error-no-form {
     button {
         margin-top: calc(0.5rem + 0.5vw);
         justify-self: start;
+    }
+}
+
+article.card {
+    li {
+        font-size: 1.1rem;
+        padding: 0.2em;
+        background-color: #ffffff1a;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+    li.checked {
+        text-decoration: line-through;
+        color: #8f8f8ffb;
     }
 }

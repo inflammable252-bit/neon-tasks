@@ -45,6 +45,7 @@ function createButtons() {
                 form.id = "date-form";
                 break;
         }
+        displayTaskForm()
     })
     buttonWrapper.replaceChildren(noteButton, checklistButton, dateButton)
     return buttonWrapper;
@@ -54,14 +55,41 @@ function createTaskSubmitButton() {
     const button = buttonObj.create();
     button.addEventListener("click", (e) => {
         e.preventDefault();
-        const regularFields = [form.title, form.description];
-        const dateFields = [...regularFields, form["due-date-input"], form["due-time-input"]]
+        const noteFields = [form.title, form.description];
+        const dateFields = [...noteFields, form["due-date-input"], form["due-time-input"]];
+        const checklistFields = [form.title];
         let checkFields;
-        select === "date" ? checkFields = dateFields : checkFields = regularFields;
+        switch (select) {
+            case ("date"):
+                checkFields = dateFields;
+                break;
+            case ("note"):
+                checkFields = noteFields;
+                break;
+            case ("checklist"):
+                checkFields = checklistFields;
+                break;
+        }
         if (!errorCheck(checkFields)) return;
+        const checklistItems = document.querySelectorAll("p.card-checklist-item");
+        if ((select==="checklist") && !checklistItems) {
+            form.description.style.border = "2px solid rgba(255, 0, 0, 0.61)";
+            return
+        }
+        let taskDescription;
+        if (select==="checklist") {
+            taskDescription = [];
+            checklistItems.forEach((item) => {
+                taskDescription.push(item.textContent)
+            })
+        }
+        else {
+            taskDescription = form.description.value
+        }
+        
         addTask(currentProjectIndex, {
             title: form.title.value, 
-            description: form.description.value, 
+            description: taskDescription, 
             dueDate: form["due-date-input"]?.value,
             dueTime: form["due-time-input"]?.value,
             priority: currentPriority,
@@ -124,30 +152,53 @@ function createProjectSubmitButton() {
 }
 
 function displayTaskForm() {
-    createButtons()
-    
-    if (form.id === `${select}-form`) return;
     form.replaceChildren("");
     form.method = "dialog";
     form.id = `${select}-form`;
     const inputWrapperObj = new Element({tag: "div", classes: "input-wrapper"})
     const inputWrapper = inputWrapperObj.create()
-    
+
     const titleLabelObj = new Label({forLink: "title-input", id: "title-label", name: "title-label", text: "Name of Task"});
     const titleLabel = titleLabelObj.create()
     const titleInputObj = new Input({type: "text", name: "title", id: "title-input", classes: "task-form-el", required: true});
     console.log(titleInputObj)
     const titleInput = titleInputObj.create();
-
-    const descriptionLabelObj = new Label(
-        {forLink: "description-input", id: "description-label", name: "description-label", text: "Task Description"});
-    const descriptionLabel = descriptionLabelObj.create();
-    const descriptionInputObj = new Element({tag: "textarea", id: "description-input", classes: "task-form-el"});
-    const descriptionInput = descriptionInputObj.create();
-    descriptionInput.name= "description";
-
-    inputWrapper.replaceChildren(titleLabel, titleInput, descriptionLabel, descriptionInput, buildDue(), buildPrioritySlider(), createTaskSubmitButton())
+    inputWrapper.replaceChildren(titleLabel, titleInput, buildDescription(), buildDue(), buildPrioritySlider(), createTaskSubmitButton())
     form.append(inputWrapper)
+}
+function buildDescription() {
+    const descriptionDiv = new Element({tag: "div", classes: "description-div"}).create();
+    const checklistItems = new Element({tag: "div", classes: "checklist-items"}).create();
+    checklistItems.name = "checklist-items-wrapper";
+    if (form.id==="checklist-form") {
+        const descriptionLabel = new Label(
+        {forLink: "description-input", id: "description-label", name: "description-label", text: "Checklist Items"}).create();
+        const descriptionInput = new Input({id: "description-input", classes: "task-form-el", type: "text", name: "list-item-input"}).create();
+        const addItem = new Element({tag: "button", classes: "checklist-add-item", text: "Add item"}).create();
+        descriptionInput.name= "description";
+        
+        addItem.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (!descriptionInput.value) return;
+            const item = new Element({tag: "p", classes: "card-checklist-item", text: descriptionInput.value}).create();
+            checklistItems.append(item);
+            descriptionInput.value = "";
+        })
+        
+        const descriptionInputDiv = new Element({tag: "div", classes: "checklist-input-div"}).create()
+        descriptionDiv.append(descriptionLabel, checklistItems, descriptionInput, addItem)
+    }
+    else {
+        const descriptionLabelObj = new Label(
+        {forLink: "description-input", id: "description-label", name: "description-label", text: "Task Description"});
+        const descriptionLabel = descriptionLabelObj.create();
+        const descriptionInputObj = new Element({tag: "textarea", id: "description-input", classes: "task-form-el"});
+        const descriptionInput = descriptionInputObj.create();
+        descriptionInput.name= "description";
+        descriptionDiv.append(descriptionLabel, descriptionInput)
+    }
+
+    return descriptionDiv;
 }
 function buildDue() {
     const dueWrapper = new Element({tag: "div", id: "due-wrapper"}).create();

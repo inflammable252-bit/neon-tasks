@@ -8,8 +8,6 @@ const timers = [];
 function populateCard(task, card) {
     const titleObj = new Element({tag: "h4", classes: "card-header", text: task.title});
     const title = titleObj.create();
-    const descriptionObj = new Element({tag: "p", classes: "card-text", text: task.description});
-    const description = descriptionObj.create()
     
     const creation = format(task.created, "MM/dd/yyyy")
     const createdDateObj = new Element({tag: "p", classes: "card-created", text: creation});
@@ -17,12 +15,33 @@ function populateCard(task, card) {
     card.position = "relative";
     
     if (task.type === "DateNote") {
-        card.append(title, createdDate, createCardTimeDiv(task,card), description);
+        card.append(title, createdDate, createCardTimeDiv(task,card), createDescription(task));
         return
     }
-    else card.append(title, createdDate, description, createCardTimeDiv(task, card));
+    else card.append(title, createdDate, createDescription(task), createCardTimeDiv(task, card));
 }
-
+function createDescription(task) {
+    if (task.type === "checklist") {
+        return createChecklist(task)
+    }
+    else {
+        const descriptionObj = new Element({tag: "p", classes: "card-text", text: task.description});
+        const description = descriptionObj.create()
+        return description
+    }
+}
+function createChecklist(task) {
+    const items = task.description;
+        const ul = new Element({tag: "ul", classes: "card-checklist"}).create();
+        items.forEach((item) => {
+            const li = new Element({tag: "li", classes: "card-checklist-item", text: item}).create();
+            li.addEventListener("click", () => {
+                li.classList.toggle("checked");
+            })
+            ul.append(li)
+        })
+        return ul;
+}
 function createCardTimeDiv(task, card) {
     const timeSectionObj = new Element({tag: "div", classes: "card-time-section"})
     const timeSection = timeSectionObj.create();
@@ -107,6 +126,7 @@ cards.forEach((card) => {
     let offsetX, offsetY;
     card.addEventListener("pointerdown", (e) => {
             if (!drag) return;
+            if (e.target.tagName === "LI") return;
             let sidebarOffsetX = (sidebar.getBoundingClientRect().right) || 0;
             let navOffsetY = nav.getBoundingClientRect().top;
             let headerOffsetY = nav.getBoundingClientRect().bottom;
