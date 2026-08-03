@@ -660,8 +660,8 @@ form#error-no-form {
 
 article.card {
     li {
-        font-size: 1.1rem;
-        padding: 0.2em;
+        font-size: 1rem;
+        padding: 0.3em 0.5em;
         background-color: #ffffff1a;
         border-radius: 4px;
         transition: all 0.2s;

@@ -70,7 +70,6 @@ function createCardTimeDiv(task, card) {
         const priorityObj = new Element({tag: "p", classes: "card-priority", text: "Priority: " + task.priority});const priority = priorityObj.create();
         timeSection.append(priority)
     }
-    console.log(task.timer)
     if (task.timer==="on") {
         let dueInfo = getDue(task);
         const timerEleObj = new Element({tag: "p", classes: "card-timer", text: dueInfo.getMsg()});

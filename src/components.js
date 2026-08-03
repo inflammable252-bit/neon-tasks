@@ -1,6 +1,7 @@
 import { parse, format, formatISO } from "date-fns";
 export { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote, debounce, throttle }
 import { populateCard } from "./cards.js"
+import { projectsList } from "./index.js";
 
 //  Elements
 class Element {
@@ -130,7 +131,6 @@ class Note {
             console.log("clicked")
             card.classList.toggle("user-selected-card")
         })
-
         cardWrapper.append(card);
         this.size = [card.clientWidth, card.clientHeight];
     }
@@ -145,7 +145,7 @@ class DateNote extends Note {
     constructor({title, description, dueDate, dueTime, created, priority, size, position, timer, type}){
         super({title, description, dueDate, dueTime, priority, size, position})
         this.timer = timer
-        this.type = "DateNote"
+        this.type = "date"
     }
     update({title, description, dueDate, dueTime, priority, size, position, timer}) {
         super.update({title, description, dueDate, dueTime, priority, size, position})
@@ -157,6 +157,8 @@ class Project {
         this.name = name
         this.color = "default"
         this.taskList = [];
+        projectsList.push(this)
+        updateLocalStorage()
     }
     addTaskToList(task) {
         let newTask;
@@ -172,13 +174,13 @@ class Project {
                 break;
         }
         this.taskList.push(newTask);
+        updateLocalStorage()
     }
     getTasks() {
         if (this.taskList)
         return this.taskList
     }
 }
-
 /*
 projectsList structure
 [
@@ -194,7 +196,10 @@ projectsList structure
   }
 ]
 */
-
+function updateLocalStorage() {
+    let projectsJsonParsed = JSON.stringify(projectsList);
+    localStorage.setItem("projectsList", projectsJsonParsed);
+}
 const debounce = (callback, wait) => {
   let timeoutId = null;
   return (...args) => {

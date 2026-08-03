@@ -56,12 +56,13 @@ function updateProjectList() {
     list.append(button)
 }
 function updateTaskList() {
-    console.log("Creating ", "index ", currentProjectIndex, projectsList)
     const list = document.querySelector("#tasks-list ul");
     list.replaceChildren("")
     const activeProject = projectsList[currentProjectIndex];
     const activeTasks = activeProject.getTasks();
+    console.log("Active tasks ", activeTasks)
     activeTasks.forEach((item, index) => {
+        console.log("Updating task list: ", item)
         const liObj = new Element({tag: "li", classes: `task-item task-${index}`});
         const li = liObj.create();
         li.tabIndex = 0;
@@ -130,7 +131,6 @@ function toggleSidebar() {
 }
 function addProject(projectName) {
     const newProject = new Project(projectName);
-    projectsList.push(newProject)
 }
 function deleteProject(projectIndex) {
     removeEmptyItems();
@@ -234,6 +234,7 @@ function changeTheme(theme) {
     modeSelect.value = theme
 }
 
+function test() {
 addProject("Your First Project")
 addProject("Your Second Project")
 addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "note"})
@@ -241,13 +242,54 @@ addTask(0, {title: "Checklist", description: ["Laundry", "Vaccuum", "Clean bathr
 addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-28", dueTime: "16:00", timer: "on"})
 addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-28", dueTime: "16:00", timer: "off"})
 addTask(1, {title: "Your new task", type: "note", text: "what"})
-// updateTask(0, 0, {title: "1st task new name"})
-
-addCardsToDesk(currentProjectIndex)
-
-// deleteTask(0, 0)
 
 updateProjectList()
 updateTaskList()
+addCardsToDesk(currentProjectIndex)
+}
 
-console.log(JSON.stringify(projectsList))
+function init() {
+    try {
+        load()
+    } catch (error) {
+        console.log("Initial load!")
+        const projectsJson = localStorage.getItem("projectsList")
+        addProject("Project 1");
+        addTask(0, {title: "Tips", description: ["Add tasks and projects from the sidebar.", "Click an item then the 'x' icon to delete it.", "Double-click a card to expand it."], dueDate: "2026-07-24", dueTime: "17:00", type: "checklist"});
+        addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-28", dueTime: "16:00", timer: "off"});
+    } finally {
+        updateProjectList()
+        updateTaskList()
+        addCardsToDesk(currentProjectIndex)
+    }
+}
+function load() {
+    const projectsJson = localStorage.getItem("projectsList")
+    let projectsJsonParsed = JSON.parse(projectsJson);
+        console.log("Log: ", {
+            json: projectsJson,
+            parsed: projectsJsonParsed,
+            currentTasks: projectsJsonParsed[currentProjectIndex].taskList
+        })
+        projectsJsonParsed.forEach((project, index) => {
+            console.log("Adding ", project.name)
+            addProject(project.name)
+            project.taskList.forEach((task) => {
+                addTask(index, task)
+                console.log("Adding task ", task)
+            })
+        })
+    updateProjectList()
+    updateTaskList()
+    addCardsToDesk(currentProjectIndex)
+}
+
+// testInit()
+// test()
+init()
+
+
+// let projectsJsonParsed = JSON.stringify(projectsList);
+// localStorage.setItem("projectsList", projectsJsonParsed)
+// projectsList = localStorage.getItem("projectsList")
+
