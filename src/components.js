@@ -114,6 +114,7 @@ class Note {
         if (dueDate) this.due = this.getDue();
         if (size) this.size = size;
         if (position) this.position = position;
+        updateLocalStorage()
     }
     newDate() {
         if (!this.created) {
@@ -136,16 +137,21 @@ class Note {
     }
 }
 class ChecklistNote extends Note {
-    constructor({title, description, dueDate, dueTime, created, priority, size, position, type}){
+    constructor({title, description, dueDate, dueTime, created, priority, size, position, type, checked}) {
         super({title, description, dueDate, dueTime, priority, size, position})
         this.type = type
+        this.checked = checked;
+    }
+    update({title, description, dueDate, dueTime, priority, size, position, checked}) {
+        super.update({title, description, dueDate, dueTime, priority, size, position});
+        this.checked = checked;
     }
 }
 class DateNote extends Note {
     constructor({title, description, dueDate, dueTime, created, priority, size, position, timer, type}){
         super({title, description, dueDate, dueTime, priority, size, position})
         this.timer = timer
-        this.type = "date"
+        this.type = type
     }
     update({title, description, dueDate, dueTime, priority, size, position, timer}) {
         super.update({title, description, dueDate, dueTime, priority, size, position})

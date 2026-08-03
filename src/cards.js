@@ -32,15 +32,32 @@ function createDescription(task) {
 }
 function createChecklist(task) {
     const items = task.description;
-        const ul = new Element({tag: "ul", classes: "card-checklist"}).create();
-        items.forEach((item) => {
-            const li = new Element({tag: "li", classes: "card-checklist-item", text: item}).create();
-            li.addEventListener("click", () => {
-                li.classList.toggle("checked");
+    const ul = new Element({tag: "ul", classes: "card-checklist"}).create();
+    const checkedArr = [];
+    items.forEach((item, index) => {
+        checkedArr.push(0);
+        if (!task.checked) task.update({checked: checkedArr})
+        const li = new Element({tag: "li", classes: "card-checklist-item", text: item}).create();
+        if (task.checked[index] === 1) li.classList.add("checked")
+        li.addEventListener("click", (e) => {
+            li.classList.toggle("checked");
+            const ulArr = Array.from(e.target.parentElement.children);
+            const indexOfLi = ulArr.indexOf(e.target)
+            const updatedChecked = task.checked;
+            updatedChecked[indexOfLi] === 0 ? updatedChecked[indexOfLi] = 1 : updatedChecked[indexOfLi] = 0;
+            task.update({checked: updatedChecked});
+
+            console.log({
+                ulArr: ulArr,
+                index: indexOfLi,
+                checkedArr: checkedArr,
+                taskChecked: task.checked,
+                updatedChecked: updatedChecked
             })
-            ul.append(li)
         })
-        return ul;
+        ul.append(li)
+    })
+    return ul;
 }
 function createCardTimeDiv(task, card) {
     const timeSectionObj = new Element({tag: "div", classes: "card-time-section"})
