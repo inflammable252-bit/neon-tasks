@@ -7,29 +7,28 @@ import { modalOn, displayDelete, displayProjectForm, displayTaskForm, zeroProjec
 import { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote, updateLocalStorage } from "./components.js";
 import closeIcon from "./images/close-svgrepo-com.svg";
 
-let autoSpread = localStorage.getItem("autoSpread") || true;
-let drag = localStorage.getItem("drag") || true;
-let mode = localStorage.getItem("mode") || "dawn";
-let modeRandom = localStorage.getItem("modeRandom") || true;;
+let autoSpread = true;
+let drag = true;
 let projectsList = []
 let currentProjectIndex = 0;
 
+let mode = "dawn";
+let modeRandom = true;
 const modeSelect = document.getElementById("mode-select");
 const modes = ["night", "dusk", "dawn"];
+
+console.log("start: ", {
+    autoSpread, drag, modeRandom, mode
+});
 
 const body = document.querySelector("body");
 const cardWrapper = document.getElementById("card-wrapper");
 
-function modeInit() {
-    if (modeRandom) {
-        mode = modes[Math.floor((Math.random() * 3))];
-        changeTheme(mode);
-    }
-}
 const autoSpreadToggle = document.getElementById("adjust-toggle");
 autoSpreadToggle.addEventListener("change", (e) => {
     e.target.checked === true ? autoSpread = true : autoSpread = false;
     localStorage.setItem("autoSpread", autoSpread)
+    console.log(autoSpread)
 })
 const dragToggle = document.getElementById("drag-toggle");
 dragToggle.addEventListener("change", (e) => {
@@ -47,9 +46,6 @@ modeSelect.addEventListener("change", (e) => {
     mode = e.target.value;
     localStorage.setItem("mode", mode)
 })
-
-
-
 function updateProjectList() {
     const list = document.querySelector("#projects-list ul");
     list.replaceChildren("")
@@ -79,9 +75,8 @@ function updateTaskList() {
     list.replaceChildren("")
     const activeProject = projectsList[currentProjectIndex];
     const activeTasks = activeProject.getTasks();
-    console.log("Active tasks ", activeTasks)
     activeTasks.forEach((item, index) => {
-        console.log("Updating task list: ", item)
+        // console.log("Updating task list: ", item)
         const liObj = new Element({tag: "li", classes: `task-item task-${index}`});
         const li = liObj.create();
         li.tabIndex = 0;
@@ -206,12 +201,12 @@ function addCardsToDesk(projectIndex) {
             task.createCard()
         } catch (error) {
             console.log(error)
-            console.log("No task found")
+            console.warn("No task found")
         }
         task.assignedIndex = counter;
         counter++
     }
-    if (drag) addDrag(cardWrapper, autoSpread)    
+    addDrag(cardWrapper, autoSpread)    
 }
 function addCard() {
     const taskList = projectsList[currentProjectIndex].taskList
@@ -253,6 +248,7 @@ function changeTheme(theme) {
     root.style.setProperty("--theme-current-font-l", `var(${newFontL})`);
 
     modeSelect.value = theme
+    localStorage.setItem("mode", mode)
 }
 
 function test() {
@@ -271,6 +267,7 @@ addCardsToDesk(currentProjectIndex)
 
 function init() {
     try {
+        console.log("Loading...")
         load()
     } catch (error) {
         console.log("Initial load!")
@@ -278,48 +275,76 @@ function init() {
         localStorage.setItem("autoSpread", autoSpread);
         localStorage.setItem("drag", drag);
         localStorage.setItem("modeRandom", modeRandom);
-        addProject("Project 1");
+        addProject("Welcome");
         addTask(0, {title: "Tips", description: ["Add tasks and projects from the sidebar.", "Click an item then the 'x' icon to delete it.", "Double-click a card to expand it."], dueDate: "2026-07-24", dueTime: "17:00", type: "checklist"});
         addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-28", dueTime: "16:00", timer: "off"});
+        console.log(error)
     } finally {
+        modeInit();
+        updateToggles()
         updateProjectList()
         updateTaskList()
         addCardsToDesk(currentProjectIndex)
+        console.log("Initialize complete!")
     }
 }
 function load() {
     const projectsJson = localStorage.getItem("projectsList")
     let projectsJsonParsed = JSON.parse(projectsJson);
-        console.log("Log: ", {
-            Settings: {autoSpread: autoSpread, drag: drag, modeRandom: modeRandom},
-            json: projectsJson,
-            parsed: projectsJsonParsed,
-            currentTasks: projectsJsonParsed[currentProjectIndex].taskList
+    console.log("localStorage log: ", {
+        json: projectsJson,
+        parsed: projectsJsonParsed,
+        currentTasks: projectsJsonParsed[currentProjectIndex].taskList
+    })
+    console.log("Current settings", {autoSpread: autoSpread, drag: drag, modeRandom: modeRandom, mode: mode},)
+    projectsJsonParsed.forEach((project, index) => {
+        // console.log("Adding ", project.name)
+        addProject(project.name)
+        project.taskList.forEach((task) => {
+            addTask(index, task)
+            // console.log("Adding task ", task)
         })
-        projectsJsonParsed.forEach((project, index) => {
-            console.log("Adding ", project.name)
-            addProject(project.name)
-            project.taskList.forEach((task) => {
-                addTask(index, task)
-                console.log("Adding task ", task)
-            })
-        })
-    updateProjectList()
-    updateTaskList()
-    addCardsToDesk(currentProjectIndex)
+    })
+    getSettingsFromLocalStorage()
+    console.log("Load complete!")
 }
 
+function modeInit() {
+    if (modeRandom) {
+        mode = modes[Math.floor((Math.random() * 3))];
+    }
+    changeTheme(mode)
+    console.log(`Mode set as ${mode}. Random mode: ${modeRandom}`)
+}
+function getSettingsFromLocalStorage() {
+    console.log("Getting settings from localStorage...")
+    autoSpread = JSON.parse(localStorage.getItem("autoSpread")) ?? true;
+    drag = JSON.parse(localStorage.getItem("drag")) ?? true;
+    mode = localStorage.getItem("mode") ?? "dawn";
+    modeRandom = JSON.parse(localStorage.getItem("modeRandom")) ?? true;
+
+    console.table("Settings updated: ", {
+    autoSpread, drag, modeRandom, mode
+    });
+    console.log("localStorage Settings log: ", {
+    autoSpread: localStorage.getItem("autoSpread"),
+    drag: localStorage.getItem("drag"),
+    modeRandom: localStorage.getItem("modeRandom"),
+    mode: localStorage.getItem("mode")
+    })
+}
+function updateToggles() {
+    console.log("Updating toggles.");
+
+    (autoSpread==true) ? autoSpreadToggle.setAttribute("checked", "") : autoSpreadToggle.removeAttribute("checked");
+    (drag==true) ? dragToggle.setAttribute("checked", "") : dragToggle.removeAttribute("checked");
+    (modeRandom==true) ? randomModeToggle.setAttribute("checked", "") : randomModeToggle.removeAttribute("checked");
+
+}
 // testInit()
 // test()
 init()
-modeInit();
 
-(autoSpread===true) ? autoSpreadToggle.setAttribute("checked", "") : autoSpreadToggle.removeAttribute("checked");
-(drag===true) ? dragToggle.setAttribute("checked", "") : dragToggle.removeAttribute("checked");
-(modeRandom===true) ? randomModeToggle.setAttribute("checked", "") : randomModeToggle.removeAttribute("checked");
-console.log( {
-    autoSpread, drag, modeRandom, mode
-});
 // let projectsJsonParsed = JSON.stringify(projectsList);
 // localStorage.setItem("projectsList", projectsJsonParsed)
 // projectsList = localStorage.getItem("projectsList")
