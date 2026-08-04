@@ -1,5 +1,5 @@
 export { createButtons, modalOn, displayTaskForm, displayProjectForm, displayDelete, zeroProjectError }
-import { projectsList, addProject, updateProjectList, deleteTask, updateTaskList, currentProjectIndex, drag, addTask, addCardsToDesk, addCard, deleteActiveTask, deleteActiveProject, projectOrTask, activeIndexToDelete, removeEmptyItems } from "./index.js"
+import { projectsList, addProject, updateProjectList, deleteTask, updateTaskList, currentProjectIndex, addTask, addCardsToDesk, addCard, deleteActiveTask, deleteActiveProject, projectOrTask, activeIndexToDelete, removeEmptyItems } from "./index.js"
 import { Element, Image, Input, Label, Project, Note, ChecklistNote } from "./components.js"
 
 const modalWindow = document.getElementById("modal-window");

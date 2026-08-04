@@ -9,16 +9,11 @@
     <header>
         <h1>NEON TASKS</h1>
         <div id ="header-right">
-                <div id="input-wrapper">
-                    <label for="drag">Drag</label>
-                    <input id="drag" class="toggle" type="checkbox" checked>
-                </div>
-                <select name="mode-select" id="mode-select">
-                    <option value="dawn">Dawn</option>
-                    <option value="dusk">Dusk</option>
-                    <option value="night">Night</option>
-                </select>
-        </div>
+        <select name="mode-select" id="mode-select">
+            <option value="dawn">Dawn</option>
+            <option value="dusk">Dusk</option>
+            <option value="night">Night</option>
+        </select>
     </header>
     <aside id ="sidebar">
         <details id="projects-list" open>
@@ -32,6 +27,16 @@
                 <li class="task"></li>
             </ul>
         </details>
+        <div class="toggle-inputs-wrapper">
+            <label for="adjust-toggle">Auto-adjust</label>
+            <input id="adjust-toggle" class="toggle" type="checkbox" checked>
+            
+            <label for="drag-toggle">Drag</label>
+            <input id="drag-toggle" class="toggle" type="checkbox" checked>
+
+            <label for="theme-toggle">Random theme:</label>
+            <input id="theme-toggle" class="toggle" type="checkbox" checked>
+        </div>
     </aside>
     <main>
         <section id="card-wrapper"></section>
@@ -43,6 +48,9 @@
             <img id="settings-icon" class="menu-buttons" src="./images/settings-svgrepo-com.svg"/>
         </div>
     </nav>
+    <aside class="settings">
+
+    </aside>
     <dialog id="modal-window">
         <div id="button-wrapper"></div>
         <img id="close-modal" src="./images/close-svgrepo-com.svg" alt="Close icon" />

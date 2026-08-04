@@ -1,5 +1,5 @@
 import { parse, format, formatISO } from "date-fns";
-export { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote, debounce, throttle }
+export { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote, updateLocalStorage, debounce, throttle }
 import { populateCard } from "./cards.js"
 import { projectsList } from "./index.js";
 
@@ -128,8 +128,9 @@ class Note {
 
         populateCard(this, card);
         
-        card.addEventListener("dblclick", () => {
-            console.log("clicked")
+        card.addEventListener("dblclick", (e) => {
+            console.log(e.target)
+            if (e.target.classList.contains("card-checklist-item")) return;
             card.classList.toggle("user-selected-card")
         })
         cardWrapper.append(card);

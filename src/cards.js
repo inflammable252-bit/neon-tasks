@@ -1,5 +1,6 @@
 // Card builder functions
 export { populateCard, addDrag, timers, getDue }
+import { drag, autoSpread } from "./index.js"
 import { Element, Label, Input, Image, Project, Note, ChecklistNote, DateNote, debounce, throttle } from "./components.js";
 import { format, formatDistance, formatISO, parseISO, compareAsc } from "date-fns";
 
@@ -46,14 +47,13 @@ function createChecklist(task) {
             const updatedChecked = task.checked;
             updatedChecked[indexOfLi] === 0 ? updatedChecked[indexOfLi] = 1 : updatedChecked[indexOfLi] = 0;
             task.update({checked: updatedChecked});
-
-            console.log({
-                ulArr: ulArr,
-                index: indexOfLi,
-                checkedArr: checkedArr,
-                taskChecked: task.checked,
-                updatedChecked: updatedChecked
-            })
+            // console.log({
+            //     ulArr: ulArr,
+            //     index: indexOfLi,
+            //     checkedArr: checkedArr,
+            //     taskChecked: task.checked,
+            //     updatedChecked: updatedChecked
+            // })
         })
         ul.append(li)
     })
@@ -133,7 +133,7 @@ function getDue(task) {
 // Card drag adapted from:
 // https://srivastavayushmaan1347.medium.com/blog-title-creating-a-draggable-div-element-with-javascript-88f3be51bbf9
 
-function addDrag(container, autoSpread) {
+function addDrag(container) {
 const cards = document.querySelectorAll(".card");
 const sidebar = document.getElementById("sidebar")
 const nav =  document.querySelector("nav");
@@ -144,8 +144,7 @@ cards.forEach((card) => {
             if (!drag) return;
             if (e.target.tagName === "LI") return;
             let sidebarOffsetX = (sidebar.getBoundingClientRect().right) || 0;
-            let navOffsetY = nav.getBoundingClientRect().top;
-            let headerOffsetY = nav.getBoundingClientRect().bottom;
+            let headerOffsetY = nav.getBoundingClientRect().bottom || 0;
             offsetX = e.clientX - card.getBoundingClientRect().left + sidebarOffsetX;
             offsetY = e.clientY - card.getBoundingClientRect().top;
             card.position = [offsetX, offsetY]
@@ -164,7 +163,7 @@ cards.forEach((card) => {
             container.removeEventListener("pointermove", pointerMoveHandler);
             container.removeEventListener("pointerup", pointerupHandler)
             getCardPositions()
-            if (autoSpread) window.addEventListener("resize", debounce(adjustCardPositions, 2000))
+            window.addEventListener("resize", debounce(adjustCardPositions, 2000))
             card.style.transition = "all 0.4s ease-in-out";
         }
     })
@@ -176,6 +175,7 @@ cards.forEach((card) => {
     }
 
     const adjustCardPositions = () => {
+        if (!autoSpread) return
         cards.forEach((card) => {
             let oldXRatio = card.dataset.x
             let oldYRatio = card.dataset.y

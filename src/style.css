@@ -101,43 +101,6 @@ div#header-right {
     text-align: end;
     align-items: center;
 }
-div#input-wrapper {
-    display: none;
-    color: #FFF;
-    padding: 1vw; 
-}
-div#header-right label {
-    padding-right: calc(0.2rem + 0.5vw);
-}
-div#header-right .toggle {
-    border: 3px solid white;
-    border-radius: 16px;
-    width: 46px;
-    height: 26px;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    display: flex;
-    align-items: center;
-}
-div#header-right .toggle::after {
-    position: relative;
-    left: 1px;
-    content: "";
-    display: inline-block;
-    /* margin: 0.5rem; */
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    background: color-mix(in srgb, var(--theme-current-accent), #FFF);
-    transition: transform 0.07s linear;
-}
-div#header-right .toggle:checked {
-    background-color: color-mix(in srgb, var(--theme-current-color), #FFF);
-}
-div#header-right .toggle:checked::after {
-    transform: translate(20px);
-}
 /* .toggle:focus {
     outline: none;
     box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.4);
@@ -157,7 +120,7 @@ aside#sidebar {
     font-family: var(--p-strong);
     
     display: grid;
-    grid-template-rows: 75px min-content min-content min-content;
+    grid-template-rows: 75px min-content 1fr min-content 0.05fr;
     gap: 3vw;
     padding: 1vw;
     z-index: 9;
@@ -221,16 +184,56 @@ aside li:focus, aside li.selected-project {
         pointer-events: all;
     }
 }
-
+div.toggle-inputs-wrapper {
+    grid-row: -3/-2;
+    display: none;
+    color: #FFF;
+    padding: 1vw; 
+}
+div.toggle-inputs.wrapper label {
+    padding-right: calc(0.2rem + 0.5vw);
+}
+.toggle {
+    border: 3px solid white;
+    border-radius: 16px;
+    width: 46px;
+    height: 26px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    display: flex;
+    align-items: center;
+}
+.toggle::after {
+    position: relative;
+    left: 1px;
+    content: "";
+    display: inline-block;
+    /* margin: 0.5rem; */
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    background: color-mix(in srgb, var(--theme-current-accent), #FFF);
+    transition: transform 0.07s linear;
+}
+.toggle:checked {
+    background-color: color-mix(in srgb, var(--theme-current-color), #FFF);
+}
+.toggle:checked::after {
+    transform: translate(20px);
+}
 @media (min-width: 768px) {
-    div#header-right div#input-wrapper {
+    div.toggle-inputs-wrapper {
         display: flex;
         align-items: start;
+        flex-direction: column;
     }
 }
 aside#sidebar {
+    overflow: auto;
     grid-row: 1/-1;
     grid-column: 1/2;
+    scrollbar-color: var(--theme-current-accent) var(--theme-current-color);
 }
 main {
     grid-row: 2/3;
