@@ -242,6 +242,7 @@ backupButton.addEventListener("click", (e) => displayModal(e))
 function changeTheme(theme) {
     const root = document.documentElement;
     let newBg = `--bg-${theme}`;
+    let newBgS = `--bg-${theme}-s`;
     let newBgColor = `--bg-${theme}-color`;
     let newDark = `--theme-${theme}-dark`;
     let newColor =  `--theme-${theme}-color`;
@@ -250,6 +251,7 @@ function changeTheme(theme) {
     let newFont = `--theme-${theme}-font`
     let newFontL = `--theme-${theme}-font-l`
     root.style.setProperty("--bg-current", `var(${newBg})`);
+    root.style.setProperty("--bg-current-s", `var(${newBgS})`);
     root.style.setProperty("--bg-current-color", `var(${newBgColor})`);
     root.style.setProperty("--theme-current-dark", `var(${newDark})`);
     root.style.setProperty("--theme-current-color", `var(${newColor}`);

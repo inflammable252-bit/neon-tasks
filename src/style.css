@@ -1,5 +1,6 @@
 :root {
     --bg-dawn: url(/src/images/dawn.png);
+    --bg-dawn-s: url(/src/images/dawn-s.png);
     --bg-dawn-color: #CD90B9;
     --theme-dawn-color: #474476;
     --theme-dawn-dark: #8C4968;
@@ -9,6 +10,7 @@
     --theme-dawn-font-l: #fa9fca;
 
     --bg-dusk: url(/src/images/dusk.png);
+    --bg-dusk-s: url(/src/images/dusk-s.png);
     --bg-dusk-color: #4888B7;
     --theme-dusk-dark: #202D40;
     --theme-dusk-color: #151f53;
@@ -18,6 +20,7 @@
     --theme-dusk-font-l: #3afd85;
 
     --bg-night: url(/src/images/night.png);
+    --bg-night-s: url(/src/images/night-s.png);
     --bg-night-color: #1F52B7;
     --theme-night-color: #1e3068;
     --theme-night-dark: #0B1443;
@@ -27,6 +30,7 @@
     --theme-night-font-l: #fddf7e;
 
     --bg-current: var(--bg-dawn);
+    --bg-current-s: var(var(--bg-dawn-s));
     --bg-current-color: var(--bg-dawn-color);
     --theme-current-dark: var(--theme-dawn-dark);
     --theme-current-color: var(--theme-dawn-color);
@@ -174,6 +178,13 @@ aside li {
     img:hover {
         background-color: rgba(255, 0, 0, 0.486);
     }
+    transition: translate 0.1s ease-in-out;
+}
+aside summary, aside li {
+    text-shadow: 3px 2px 2px rgba(0, 0, 0, 0.226);
+}
+aside li:hover {
+    translate: 0 -2px;
 }
 aside li:focus, aside li.selected-project {
     img {
@@ -270,10 +281,13 @@ main {
     grid-row: 2/3;
     grid-column: 2/3;
     display: flex;
-    background-image: var(--bg-current);
+    background-image: image-set(
+        var(--bg-current-s) 1x,   
+        var(--bg-current) 2x
+    );
+    background-size: cover;
     background-repeat: repeat-x;
     background-position: bottom;
-    transition: background-image 0.3s ease-in-out;
 }
 nav {
     grid-row: 3/4;
@@ -631,14 +645,58 @@ button#submit, div#delete-buttons-wrapper button, button#cancel-button, button#c
     border: 2px solid var(--theme-dawn-font);
     font-size: 1.1em;
     margin-top: 1em;
-    font-family: var(--p-strong)
+    font-family: var(--p-strong);
 }
-button#create-project, button#create-task, button#backup {
+aside button {
     background-color: var(--theme-current-color);
     color: #FFF;
     margin: 0.25em 1em;
+    box-shadow:
+    1px 1px 2px #00000036,
+    1px 1px 6px #00000065;
+    transition: all 0.05s ease-in-out;
 }
 
+aside button:hover, button#backup:hover, dialog button:hover {
+    box-shadow: none;
+    animation: buttonWave 0.7s ease-in-out infinite;
+}
+@keyframes buttonWave {
+    0%, 100% {
+        translate: 0;
+    }
+    25% {
+        translate: 0 2%
+    }
+    50% {
+        translate: 0 11%;
+    }
+    75% {
+        translate: 0 4%
+    }
+    90% {
+        translate: 0 2%
+    }
+}
+dialog button {
+    box-shadow:
+    1px 1px 2px #00000036,
+    1px 1px 6px #00000065;
+    transition: all 0.2s ease-in-out;
+}
+form#note-form button:hover, form#project-form button:hover {
+    border-color: white;
+}
+form#note-form button:active, form#project-form button:active {
+    background-color: color-mix(in srgb, var(--theme-current-accent), #FFF 40%);
+}
+dialog form button:hover {
+    animation: buttonWave 0.55s infinite;
+    border-color: #FFF;
+}
+aside button:active {
+    background-color: #ffffff49;
+}
 form#project-form {
     display: flex;
     gap: 1vw;
@@ -698,17 +756,20 @@ form#error-no-form {
 }
 
 article.card {
+    transition: translate 0.2s;
     li {
         font-size: 1rem;
         padding: 0.3em 0.5em;
         background-color: #ffffff1a;
         border-radius: 4px;
-        transition: all 0.2s;
     }
     li.checked {
         text-decoration: line-through;
         color: #8f8f8ffb;
     }
+}
+article.card:hover {
+    translate: 2.5px -5px;
 }
 button#backup {
     background-color: var(--theme-current-op);

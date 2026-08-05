@@ -188,7 +188,7 @@ function buildDescription() {
     }
     else {
         const descriptionLabelObj = new Label(
-        {forLink: "description-input", id: "description-label", name: "description-label", text: "Task Description"});
+        {forLink: "description-input", id: "description-label", name: "description-label", text: "Task Description*"});
         const descriptionLabel = descriptionLabelObj.create();
         const descriptionInputObj = new Element({tag: "textarea", id: "description-input", classes: "task-form-el"});
         const descriptionInput = descriptionInputObj.create();
@@ -346,6 +346,7 @@ function displayBackup() {
 
     let timer;
     function hold() {
+        applyButton.textContent = "Applying..."
         timer = setTimeout(() => {
             applyNewJson()
             modalWindow.close()
@@ -353,6 +354,7 @@ function displayBackup() {
         }, 3000);
     }
     function cancel() {
+        applyButton.textContent = "Apply"
         clearTimeout(timer)
     }
     applyButton.addEventListener("click", (e) => e.preventDefault())
