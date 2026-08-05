@@ -100,11 +100,8 @@ div#header-right {
     display: flex;
     text-align: end;
     align-items: center;
+    justify-content: right;
 }
-/* .toggle:focus {
-    outline: none;
-    box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.4);
-} */
 
 div#header-right select {
     height: min-content;
@@ -185,10 +182,35 @@ aside li:focus, aside li.selected-project {
     }
 }
 div.toggle-inputs-wrapper {
+    justify-self: center;
+    position: fixed;
+    right: 0;
+    bottom: 0;
     grid-row: -3/-2;
-    display: none;
     color: #FFF;
-    padding: 1vw; 
+    padding: 0;
+    border-radius: 6px 0;
+    background-color: color-mix(in srgb, var(--theme-current-color), #ffffffc9 25%);
+    overflow: hidden;
+    width: 0;
+    transition: all 0.2s ease-in-out;
+    label {
+        padding-top: 1em;
+        opacity: 0;
+    }
+    input {
+        opacity: 0;
+        /* display: none; */
+    }
+}
+div.toggle-inputs-wrapper.selected-settings {
+    width: max-content;
+    right: 0;
+    padding: 1.5em 1.5em 20%;
+    label, input {
+        opacity: 1;
+        display: block;
+    }
 }
 div.toggle-inputs.wrapper label {
     padding-right: calc(0.2rem + 0.5vw);
@@ -222,11 +244,16 @@ div.toggle-inputs.wrapper label {
 .toggle:checked::after {
     transform: translate(20px);
 }
-@media (min-width: 768px) {
-    div.toggle-inputs-wrapper {
-        display: flex;
-        align-items: start;
-        flex-direction: column;
+@media (min-width: 1024px) {
+    div.toggle-inputs-wrapper, div.toggle-inputs-wrapper.settings-selected {
+        position: relative;
+        background: none;
+        width: fit-content;
+
+        label, input {
+            opacity: 1;
+            display: block;
+        }
     }
 }
 aside#sidebar {

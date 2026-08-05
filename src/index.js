@@ -143,6 +143,13 @@ function toggleSidebar() {
     const sidebar = document.getElementById("sidebar");
     sidebar.classList.toggle("show")
 }
+const settingsIcon = document.getElementById("settings-icon");
+settingsIcon.addEventListener("click", () => toggleSettingsSidebar())
+function toggleSettingsSidebar() {
+    const settings = document.querySelector("div.toggle-inputs-wrapper");
+    console.log(settings)
+    settings.classList.toggle("selected-settings")
+}
 function addProject(projectName) {
     const newProject = new Project(projectName);
 }
