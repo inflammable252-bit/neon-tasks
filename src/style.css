@@ -117,7 +117,7 @@ aside#sidebar {
     font-family: var(--p-strong);
     
     display: grid;
-    grid-template-rows: 75px min-content 1fr min-content 0.05fr;
+    grid-template-rows: 75px min-content 1fr min-content min-content 0.05fr;
     gap: 3vw;
     padding: 1vw;
     z-index: 9;
@@ -187,7 +187,7 @@ div.toggle-inputs-wrapper {
     position: fixed;
     right: 0;
     bottom: 0;
-    grid-row: -3/-2;
+    grid-row: 4/5;
     color: #FFF;
     border-radius: 6px 0;
     background-color: color-mix(in srgb, var(--theme-current-color), #ffffffc9 25%);
@@ -248,12 +248,13 @@ div.toggle-inputs.wrapper label {
     transform: translate(20px);
 }
 @media (min-width: 1024px) {
-    aside div.toggle-inputs-wrapper, aside div.toggle-inputs-wrapper.settings-selected {
+    aside#sidebar div.toggle-inputs-wrapper, aside#sidebar div.toggle-inputs-wrapper.settings-selected {
         box-shadow: none;
         position: relative;
         background: none;
         opacity: 1;
         height: min-content;
+        padding-bottom: 2vw;
         label, input {
             opacity: 1;
         }
@@ -531,10 +532,14 @@ button.type-button.selected {
 
 div#due-wrapper {
     display: grid;
-    grid-template-columns: auto auto;
-    grid-template-rows: auto auto;
     label {
         grid-column: 1/-1;
+    }
+}
+@media (min-width: 768px) {
+    div#due-wrapper {
+        grid-template-columns: auto auto;
+        grid-template-rows: auto auto;
     }
 }
 div#priority-wrapper {
@@ -621,13 +626,14 @@ button {
     justify-self: center;
     padding: 0 1em;
 }
-button#submit, div#delete-buttons-wrapper button, button#cancel-button {
+button#submit, div#delete-buttons-wrapper button, button#cancel-button, button#copy-button, button#apply-button {
     background-color: var(--theme-current-accent);
     border: 2px solid var(--theme-dawn-font);
     font-size: 1.1em;
     margin-top: 1em;
+    font-family: var(--p-strong)
 }
-button#create-project, button#create-task {
+button#create-project, button#create-task, button#backup {
     background-color: var(--theme-current-color);
     color: #FFF;
     margin: 0.25em 1em;
@@ -703,4 +709,62 @@ article.card {
         text-decoration: line-through;
         color: #8f8f8ffb;
     }
+}
+button#backup {
+    background-color: var(--theme-current-op);
+    font-size: 1.25em;
+    padding: 0.2em 1em;
+    grid-row: 5/6;
+}
+form#backup-form {
+    width: 100%;
+    p {
+        font-family: var(--p-strong);
+        text-wrap: pretty;
+        padding: 0 0.5vw 0.5vw;
+    }
+}
+form#backup-form button.backup-button {
+    width: 75%;
+    border: 2px solid #ffffffc5;
+}
+button#apply-button {
+    margin-top: 0.5em;
+    background-color: #ff395aa2;
+    color: #FFF;
+}
+@keyframes holdApply {
+    0% {
+        background-color: #ff395aa2;
+    }
+    100% {
+        color: #000;
+        background-color: var(--theme-current-font);
+        border-color: var(--theme-current-font-l);
+    }
+}
+form#backup-form button#apply-button:active {
+    animation: holdApply 3s linear 0.1s 1;
+}
+@keyframes copy {
+    0% {
+        background-color: color-mix(in srgb, var(--theme-current-accent), #FFF 75%)
+    }
+    50% {
+
+        background-color: #FFF;
+    }
+    100% {
+        background-color: color-mix(in srgb, var(--theme-current-accent), #FFF 75%)
+
+    }
+}
+button#copy-button {
+    background-color: color-mix(in srgb, var(--theme-current-accent), #FFF 75%);
+}
+button#copy-button:focus {
+    animation: copy 1s linear 0.1s 1;
+}
+textarea#backup-text {
+    width: 100%;
 }

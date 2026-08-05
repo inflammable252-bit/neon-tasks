@@ -1,11 +1,11 @@
-import "./style.css"
-import "./reset.css"
+import "./style.css";
+import "./reset.css";
+import { addDrag, timers, getDue } from "./cards.js";
+import { modalOn, displayDelete, displayProjectForm, displayTaskForm, createButtons, displayBackup } from "./modal-window.js";
+import { Element, Image, Project, updateLocalStorage } from "./components.js";
+import closeIcon from "./images/close-svgrepo-com.svg";
 
 export { projectsList, addProject, updateProjectList, deleteTask, updateTaskList, currentProjectIndex, drag, autoSpread, addTask, addCard, addCardsToDesk, deleteActiveTask, deleteActiveProject, projectOrTask, activeIndexToDelete, removeEmptyItems }
-import { populateCard, addDrag, timers, getDue } from "./cards.js";
-import { modalOn, displayDelete, displayProjectForm, displayTaskForm, zeroProjectError, createButtons } from "./modal-window.js"
-import { Element, Image, Input, Label, Project, Note, ChecklistNote, DateNote, updateLocalStorage } from "./components.js";
-import closeIcon from "./images/close-svgrepo-com.svg";
 
 let autoSpread = true;
 let drag = true;
@@ -132,6 +132,7 @@ function displayModal(e) {
     }
     if (e.target.id==="create-project") displayProjectForm();
     if (e.target.classList.contains("delete-icon")) displayDelete();
+    if (e.target.id==="backup") displayBackup()
 }
 const addIcon = document.getElementById("add-icon");
 addIcon.addEventListener("click", (e) => {
@@ -235,6 +236,9 @@ function updateTimers() {
     }, 45000);
 }
 
+const backupButton = document.getElementById("backup");
+backupButton.addEventListener("click", (e) => displayModal(e))
+
 function changeTheme(theme) {
     const root = document.documentElement;
     let newBg = `--bg-${theme}`;
@@ -287,13 +291,17 @@ function init() {
         addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-28", dueTime: "16:00", timer: "off"});
         console.log(error)
     } finally {
-        modeInit();
-        updateToggles()
-        updateProjectList()
-        updateTaskList()
-        addCardsToDesk(currentProjectIndex)
+        updateDesk()
         console.log("Initialize complete!")
     }
+}
+function updateDesk() {
+    console.log("Updating desk")
+    modeInit();
+    updateToggles()
+    updateProjectList()
+    updateTaskList()
+    addCardsToDesk(currentProjectIndex)
 }
 function load() {
     const projectsJson = localStorage.getItem("projectsList")
@@ -346,13 +354,7 @@ function updateToggles() {
     (autoSpread==true) ? autoSpreadToggle.setAttribute("checked", "") : autoSpreadToggle.removeAttribute("checked");
     (drag==true) ? dragToggle.setAttribute("checked", "") : dragToggle.removeAttribute("checked");
     (modeRandom==true) ? randomModeToggle.setAttribute("checked", "") : randomModeToggle.removeAttribute("checked");
-
 }
-// testInit()
 // test()
 init()
-
-// let projectsJsonParsed = JSON.stringify(projectsList);
-// localStorage.setItem("projectsList", projectsJsonParsed)
-// projectsList = localStorage.getItem("projectsList")
 

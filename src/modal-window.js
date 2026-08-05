@@ -1,4 +1,4 @@
-export { createButtons, modalOn, displayTaskForm, displayProjectForm, displayDelete, zeroProjectError }
+export { createButtons, modalOn, displayTaskForm, displayProjectForm, displayDelete, zeroProjectError, displayBackup }
 import { projectsList, addProject, updateProjectList, deleteTask, updateTaskList, currentProjectIndex, addTask, addCardsToDesk, addCard, deleteActiveTask, deleteActiveProject, projectOrTask, activeIndexToDelete, removeEmptyItems } from "./index.js"
 import { Element, Image, Input, Label, Project, Note, ChecklistNote } from "./components.js"
 
@@ -311,4 +311,62 @@ function zeroProjectError() {
     })
 
     form.append(errorText, closeButton)
+}
+function displayBackup() {
+    buttonWrapper.replaceChildren("");
+    form.id = "backup-form";
+    form.replaceChildren("");
+
+    const p = new Element({tag: "p", text: "Your projects, tasks, and settings are saved on your browser. Back these up by copying and pasting the text into a separate file!"}).create()
+    const p2 = new Element({tag: "p", text: "Or, paste your existing backup and hold the 'Apply' button for three seconds."}).create()
+    const copyButton = new Element({tag: "button", text: "Copy to clipboard", classes: "backup-button", id: "copy-button"}).create()
+    let localStorageText = JSON.stringify(localStorage);
+    console.log(localStorage)
+    console.log(localStorageText)
+    const textBox = new Element({tag: "textarea", id: "backup-text", text: localStorageText}).create();
+    textBox.name = "json-text"
+    
+    const applyButton = new Element({tag: "button", text: "Apply", classes: "backup-button", id: "apply-button"}).create();
+
+    function applyNewJson() {
+        const toJson = JSON.parse(form["json-text"].value);
+        for (const [key, value] of Object.entries(toJson)) {
+            localStorage.setItem(key, value)
+        }
+    }
+    function copy() {
+        navigator.clipboard.writeText(form["json-text"].value)
+    }
+    copyButton.addEventListener("click", (e) => {
+        e.preventDefault()
+        textBox.select()
+        copyButton.textContent = "Copied!"
+        copy()
+    })
+
+    let timer;
+    function hold() {
+        timer = setTimeout(() => {
+            applyNewJson()
+            modalWindow.close()
+            window.location.reload()
+        }, 3000);
+    }
+    function cancel() {
+        clearTimeout(timer)
+    }
+    applyButton.addEventListener("click", (e) => e.preventDefault())
+    applyButton.addEventListener("mousedown", (e) => hold())
+    applyButton.addEventListener("mouseup", (e) => {
+        e.preventDefault()
+        cancel()
+    })
+    applyButton.addEventListener("touchstart", (e) => hold())
+    applyButton.addEventListener("touchend", (e) => {
+        e.preventDefault()
+        cancel()
+    })
+
+    form.append(p, p2, textBox, copyButton, applyButton)
+    textBox.select()
 }
