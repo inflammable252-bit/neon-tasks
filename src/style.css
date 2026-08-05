@@ -121,8 +121,7 @@ aside#sidebar {
     font-family: var(--p-strong);
     
     display: grid;
-    grid-template-rows: 75px min-content 1fr min-content min-content min-content 34px;
-    gap: 3vw;
+    grid-template-rows: 75px min-content 0.6fr 0.3fr 0.1fr min-content 50px;
     padding: 1vw;
     z-index: 9;
     width: 0;
@@ -149,9 +148,11 @@ aside#sidebar.show {
     }
 }
 aside#sidebar details#projects-list {
+        padding-top: 1vw;
         grid-row: 2/3;
     }
     aside#sidebar details#tasks-list {
+        padding-top: 1vw;
         grid-row: 3/4;
     }
 aside#sidebar ul {
@@ -830,19 +831,29 @@ textarea#backup-text {
     width: 100%;
 }
 .link-wrapper {
+    display: none;
     grid-row: 6/7;
-    font-size: 0.65em;
-    display: flex;
+    font-size: 0.7em;
     flex-direction: column;
     p, a {
+        align-self: start;
         color: #ffffffc5;
+        text-decoration: none;
+        transition: color 0.4s ease-in-out;
     }
-    p#art-credit {
-        
+    a:hover {
+        color: #FFF;
+        text-decoration: underline;
+    }
+}
+aside#sidebar.show {
+    .link-wrapper {
+        display: flex;
     }
 }
 @media (min-width: 1024px) {
 .link-wrapper {
+    display: flex;
     align-items: center;
     }
 }
