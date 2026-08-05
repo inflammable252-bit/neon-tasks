@@ -182,34 +182,37 @@ aside li:focus, aside li.selected-project {
     }
 }
 div.toggle-inputs-wrapper {
+    padding: 1.5em 1.5em clamp(5em, 10vw, 15vw);
     justify-self: center;
     position: fixed;
     right: 0;
     bottom: 0;
     grid-row: -3/-2;
     color: #FFF;
-    padding: 0;
     border-radius: 6px 0;
     background-color: color-mix(in srgb, var(--theme-current-color), #ffffffc9 25%);
     overflow: hidden;
-    width: 0;
+    height: 0;
+    opacity: 0;
     transition: all 0.2s ease-in-out;
+    
     label {
         padding-top: 1em;
         opacity: 0;
     }
     input {
         opacity: 0;
-        /* display: none; */
     }
 }
+
 div.toggle-inputs-wrapper.selected-settings {
     width: max-content;
     right: 0;
-    padding: 1.5em 1.5em 20%;
+    height: min-content;
+    box-shadow: -2px -2px 0px 2px var(--bg-current-color);
+    opacity: 1;
     label, input {
         opacity: 1;
-        display: block;
     }
 }
 div.toggle-inputs.wrapper label {
@@ -245,14 +248,14 @@ div.toggle-inputs.wrapper label {
     transform: translate(20px);
 }
 @media (min-width: 1024px) {
-    div.toggle-inputs-wrapper, div.toggle-inputs-wrapper.settings-selected {
+    aside div.toggle-inputs-wrapper, aside div.toggle-inputs-wrapper.settings-selected {
+        box-shadow: none;
         position: relative;
         background: none;
-        width: fit-content;
-
+        opacity: 1;
+        height: min-content;
         label, input {
             opacity: 1;
-            display: block;
         }
     }
 }
