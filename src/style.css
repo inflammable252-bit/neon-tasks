@@ -121,7 +121,7 @@ aside#sidebar {
     font-family: var(--p-strong);
     
     display: grid;
-    grid-template-rows: 75px min-content 1fr min-content min-content 0.05fr;
+    grid-template-rows: 75px min-content 1fr min-content min-content min-content 34px;
     gap: 3vw;
     padding: 1vw;
     z-index: 9;
@@ -317,7 +317,7 @@ div.menu-buttons-wrapper img {
 }
 @media (min-width: 1024px) {
     nav {
-        height: 25px;
+        height: 34px;
     }
     aside#sidebar, aside#sidebar.show {
         position: static;
@@ -828,4 +828,21 @@ button#copy-button:focus {
 }
 textarea#backup-text {
     width: 100%;
+}
+.link-wrapper {
+    grid-row: 6/7;
+    font-size: 0.65em;
+    display: flex;
+    flex-direction: column;
+    p, a {
+        color: #ffffffc5;
+    }
+    p#art-credit {
+        
+    }
+}
+@media (min-width: 1024px) {
+.link-wrapper {
+    align-items: center;
+    }
 }

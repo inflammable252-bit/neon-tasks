@@ -300,10 +300,10 @@ function init() {
 function updateDesk() {
     console.log("Updating desk")
     modeInit();
-    updateToggles()
     updateProjectList()
     updateTaskList()
     addCardsToDesk(currentProjectIndex)
+    updateToggles()
 }
 function load() {
     const projectsJson = localStorage.getItem("projectsList")
@@ -313,7 +313,7 @@ function load() {
         parsed: projectsJsonParsed,
         currentTasks: projectsJsonParsed[currentProjectIndex].taskList
     })
-    console.log("Current settings", {autoSpread: autoSpread, drag: drag, modeRandom: modeRandom, mode: mode},)
+    console.log("Current page settings", {autoSpread: autoSpread, drag: drag, modeRandom: modeRandom, mode: mode},)
     projectsJsonParsed.forEach((project, index) => {
         // console.log("Adding ", project.name)
         addProject(project.name)
@@ -340,7 +340,7 @@ function getSettingsFromLocalStorage() {
     mode = localStorage.getItem("mode") ?? "dawn";
     modeRandom = JSON.parse(localStorage.getItem("modeRandom")) ?? true;
 
-    console.table("Settings updated: ", {
+    console.log("Updated page settings: ", {
     autoSpread, drag, modeRandom, mode
     });
     console.log("localStorage Settings log: ", {
@@ -352,10 +352,11 @@ function getSettingsFromLocalStorage() {
 }
 function updateToggles() {
     console.log("Updating toggles.");
-
-    (autoSpread==true) ? autoSpreadToggle.setAttribute("checked", "") : autoSpreadToggle.removeAttribute("checked");
-    (drag==true) ? dragToggle.setAttribute("checked", "") : dragToggle.removeAttribute("checked");
-    (modeRandom==true) ? randomModeToggle.setAttribute("checked", "") : randomModeToggle.removeAttribute("checked");
+    console.log("Current page settings to toggle", {autoSpread: autoSpread, drag: drag, modeRandom: modeRandom, mode: mode});
+    (autoSpread===true) ? autoSpreadToggle.setAttribute("checked", "") : autoSpreadToggle.checked = false;
+    (drag===true) ? dragToggle.setAttribute("checked", "") : dragToggle.checked = false;
+    (modeRandom===true) ? randomModeToggle.setAttribute("checked", "") : randomModeToggle.checked = false;
+    
 }
 // test()
 init()
