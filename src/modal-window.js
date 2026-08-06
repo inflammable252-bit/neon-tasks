@@ -360,9 +360,10 @@ function displayBackup() {
     applyButton.addEventListener("click", (e) => e.preventDefault())
     applyButton.addEventListener("mousedown", (e) => hold())
     applyButton.addEventListener("mouseup", (e) => {
-        e.preventDefault()
         cancel()
+        e.preventDefault()
     })
+    applyButton.addEventListener("mouseleave", (e) => cancel())
     applyButton.addEventListener("touchstart", (e) => hold())
     applyButton.addEventListener("touchend", (e) => {
         e.preventDefault()

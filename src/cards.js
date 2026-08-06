@@ -15,7 +15,7 @@ function populateCard(task, card) {
     const createdDate = createdDateObj.create();
     card.position = "relative";
     
-    if (task.type === "DateNote") {
+    if (task.type === "date") {
         card.append(title, createdDate, createCardTimeDiv(task,card), createDescription(task));
         return
     }

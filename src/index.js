@@ -28,7 +28,6 @@ const autoSpreadToggle = document.getElementById("adjust-toggle");
 autoSpreadToggle.addEventListener("change", (e) => {
     e.target.checked === true ? autoSpread = true : autoSpread = false;
     localStorage.setItem("autoSpread", autoSpread)
-    console.log(autoSpread)
 })
 const dragToggle = document.getElementById("drag-toggle");
 dragToggle.addEventListener("change", (e) => {
@@ -220,7 +219,7 @@ function addCard() {
     const taskList = projectsList[currentProjectIndex].taskList
     const task = taskList[taskList.length-1];
     console.log(taskList)
-    cardWrapper.append(task.createCard());
+    task.createCard();
     updateTimers()
     if (drag) addDrag(cardWrapper, autoSpread);
 }
@@ -289,6 +288,7 @@ function init() {
         localStorage.setItem("drag", drag);
         localStorage.setItem("modeRandom", modeRandom);
         addProject("Welcome");
+        addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "note"})
         addTask(0, {title: "Tips", description: ["Add tasks and projects from the sidebar.", "Click an item then the 'x' icon to delete it.", "Double-click a card to expand it."], dueDate: "2026-07-24", dueTime: "17:00", type: "checklist"});
         addTask(0, {title: "Date Note", description: "A date will be emphasized above with a description and an optional timer.", priority: "High", type: "date", dueDate: "2026-07-28", dueTime: "16:00", timer: "off"});
         console.log(error)
@@ -360,4 +360,3 @@ function updateToggles() {
 }
 // test()
 init()
-
