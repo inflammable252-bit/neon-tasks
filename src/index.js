@@ -288,7 +288,6 @@ function init() {
         localStorage.setItem("drag", drag);
         localStorage.setItem("modeRandom", modeRandom);
         addProject("Welcome");
-        addTask(0, {title: "Your first note!", description: "Note description goes here.", priority: "Low", type: "note"})
         addTask(0, {title: "Tips", description: ["Add tasks and projects from the sidebar.", "Click an item then the 'x' icon to delete it.", "Double-click a card to expand it."], dueDate: "2026-07-24", dueTime: "17:00", type: "checklist"});
         console.log(error)
     } finally {
