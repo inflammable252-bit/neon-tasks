@@ -220,6 +220,7 @@ function buildDue() {
 }
 let currentPriority;
 function buildPrioritySlider() {
+    currentPriority = undefined;
     const priorityAndTimerWrapper = new Element({tag: "div", id: "priority-wrapper"}).create()
     const priorityLabelObj = new Label({id: "priority-label", forLink: "priority-list", text: "Priority"})
     const priorityLabel = priorityLabelObj.create();
@@ -232,6 +233,7 @@ function buildPrioritySlider() {
     priority.setAttribute("value", "0");
     const priorityMarkers = new Element({tag: "datalist", id: "priority-markers"}).create();
     const priorityMarkerLabels = new Element({tag: "div", id: "priority-marker-labels"}).create()
+    console.log(currentPriority)
     priority.addEventListener("change", (e) => {
         switch (e.target.value) {
             case ("0"):

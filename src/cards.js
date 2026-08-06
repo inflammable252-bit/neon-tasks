@@ -84,7 +84,8 @@ function createCardTimeDiv(task, card) {
         }
     }
     if (task.priority) {
-        const priorityObj = new Element({tag: "p", classes: "card-priority", text: "Priority: " + task.priority});const priority = priorityObj.create();
+        const priorityObj = new Element({tag: "p", classes: "card-priority", text: "Priority: " + task.priority});
+        const priority = priorityObj.create();
         timeSection.append(priority)
     }
     if (task.timer==="on") {

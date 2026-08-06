@@ -122,7 +122,7 @@ aside#sidebar {
     font-family: var(--p-strong);
     
     display: grid;
-    grid-template-rows: 75px min-content auto auto 0.1fr min-content 50px;
+    grid-template-rows: calc(75px + 0.5vw) min-content auto auto 0.1fr min-content 50px;
     padding: 1vw;
     z-index: 9;
     width: 0;
@@ -847,6 +847,7 @@ textarea#backup-text {
     grid-row: 6/7;
     font-size: 0.7em;
     flex-direction: column;
+    padding: 1.25vw 0 0;
     p, a {
         align-self: start;
         color: #ffffffc5;
