@@ -149,27 +149,49 @@ aside#sidebar.show {
     }
 }
 aside#sidebar details#projects-list {
-        padding-top: 1vw;
-        grid-row: 2/3;
-    }
-    aside#sidebar details#tasks-list {
-        padding-top: 1vw;
-        grid-row: 3/4;
-    }
+    padding-top: 1vw;
+    grid-row: 2/3;
+}
+aside#sidebar details#tasks-list {
+    padding-top: 1vw;
+    grid-row: 3/4;
+}
 aside#sidebar ul {
-        list-style-type: none;
-        padding-left: 0.3em;
-    }
-aside#sidebar li.selected-project, aside#sidebar li.task-item:focus {
-        background-color: #ffffff31;
-        border-radius: 6px;
-    }
+    list-style-type: none;
+    padding-left: 0.3em;
+}
+aside#sidebar .edit-item {
+    display: none;
+    position: absolute;
+    align-self: end;
+    font-size: 0.75em;
+    padding: 0 0.2em;
+    border-radius: 4px;
+    background-color: color-mix(in srgb, var(--theme-current-op) 75%, #ffffff00);
+}
+aside#sidebar li.selected-project .edit-item,
+aside#sidebar li.task-item:focus .edit-item, aside#sidebar li.task-item:hover .edit-item {
+    display: block;
+    position: relative;
+    margin: 0.5em 0.5em 0.5em auto;
+}
+aside#sidebar li.selected-project, aside#sidebar li.task-item:focus, li.task-item:hover {
+    background-color: #ffffff31;
+    border-radius: 6px;
+}
 aside li {
+    transition: all 0.25s ease-in-out;
+    position: relative;
     display: flex;
     align-items: center;
     gap: 0.4em;
     padding-left: 0.15em;
+    p {
+        padding: 0.25em;
+        line-height: 1.05;
+    }
     img {
+        margin-top: 0.1em;
         opacity: 0;
         height: 0.95em;
         width: 0.95em;
@@ -180,7 +202,6 @@ aside li {
     img:hover {
         background-color: rgba(255, 0, 0, 0.486);
     }
-    transition: translate 0.1s ease-in-out;
 }
 aside summary, aside li {
     text-shadow: 3px 2px 2px rgba(0, 0, 0, 0.226);
@@ -188,10 +209,27 @@ aside summary, aside li {
 aside li:hover {
     translate: 0 -2px;
 }
-aside li:focus, aside li.selected-project {
+@keyframes spin {
+    0% {
+        transform: scale(1)
+    }
+    50% {
+        transform: scale(1.1)
+    }
+    100% {
+        transform: scale(1.05)
+    }
+}
+aside li:focus, aside li:hover, aside li.selected-project {
     img {
         opacity: 1;
         pointer-events: all;
+        align-self: start;
+        transition: all 0.3s linear;
+    }
+    img:hover {
+        background-color: rgba(192, 0, 0, 0.356);
+        animation: spin 0.5s infinite ease-in-out;
     }
 }
 div.toggle-inputs-wrapper {

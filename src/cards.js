@@ -1,6 +1,6 @@
 // Card builder functions
 export { populateCard, addDrag, timers, getDue }
-import { drag, autoSpread } from "./index.js"
+import { drag, autoSpread, projectsList, currentProjectIndex } from "./index.js"
 import { Element, Label, Input, Image, Project, Note, ChecklistNote, DateNote, debounce, throttle } from "./components.js";
 import { format, formatDistance, formatISO, parseISO, compareAsc } from "date-fns";
 

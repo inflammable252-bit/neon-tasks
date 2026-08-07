@@ -1,21 +1,39 @@
 export { createButtons, modalOn, displayTaskForm, displayProjectForm, displayDelete, zeroProjectError, displayBackup }
 import { projectsList, addProject, updateProjectList, deleteTask, updateTaskList, currentProjectIndex, addTask, addCardsToDesk, addCard, deleteActiveTask, deleteActiveProject, projectOrTask, activeIndexToDelete, removeEmptyItems } from "./index.js"
-import { Element, Image, Input, Label, Project, Note, ChecklistNote } from "./components.js"
+import { Element, Image, Input, Label, Project, Note, ChecklistNote, updateLocalStorage } from "./components.js"
 
 const modalWindow = document.getElementById("modal-window");
 const buttonWrapper = document.getElementById("button-wrapper");
+let buttons = [];
+let buttonSource;
+buttonWrapper.addEventListener("click", buttonSwap) 
 const form = document.querySelector("form.modal-form");
 let select = "note";
 function modalOn(state) {
     state==="on" ? modalWindow.showModal() : modalWindow.close()
 }
-function createButtons() {
-    select = "note";
-    const noteButton = new Element({tag: "button", id: "note-button", classes: "type-button selected", text: "Note"}).create();
-    const checklistButton = new Element({tag: "button", id: "checklist-button", classes: "type-button", text: "Checklist"}).create();
-    const dateButton = new Element({tag: "button", id: "date-button", classes: "type-button", text: "Date"}).create();
-
-    buttonWrapper.addEventListener("click", (e) => {
+function createButtons(action) {
+    buttonSource = action;
+    const typeOfNote = projectsList[currentProjectIndex].taskList[activeIndexToDelete]?.type;
+    console.log("creating buttons, action: ", action)
+    select = typeOfNote ?? "note";
+    console.log("type of note", typeOfNote)
+    let noteButton = new Element({tag: "button", id: "note-button", classes: "type-button", text: "Note"}).create();
+    let checklistButton = new Element({tag: "button", id: "checklist-button", classes: "type-button", text: "Checklist"}).create();
+    let dateButton = new Element({tag: "button", id: "date-button", classes: "type-button", text: "Date"}).create();
+    buttonWrapper.replaceChildren(noteButton, checklistButton, dateButton);
+    if (action === "edit") {
+        selectForm(select)
+        displayTaskForm()
+    }
+    else noteButton.className = "type-button selected"
+}
+function buttonSwap(e) {
+        console.log("action in listener", buttonSource)
+        if (buttonSource === "edit") {
+            console.log("edit, returning")
+            return
+        }
         if (e.target.tagName !== "BUTTON") return
         for (const button of buttonWrapper.children) {
             button.classList.remove("selected")
@@ -31,24 +49,28 @@ function createButtons() {
                 select = "date";
                 break;
             }
-        switch (select) {
-            case ("note"):
-                noteButton.className = "type-button selected";
-                form.id = "note-form"
-                break;
-            case ("checklist"):
-                checklistButton.className = "type-button selected";
-                form.id = "checklist-form";
-                break;
-            case ("date"):
-                dateButton.className = "type-button selected";
-                form.id = "date-form";
-                break;
-        }
+        selectForm(select)
         displayTaskForm()
-    })
-    buttonWrapper.replaceChildren(noteButton, checklistButton, dateButton)
-    return buttonWrapper;
+}
+function selectForm(select) {
+    let noteButton = document.getElementById("note-button");
+    let checklistButton = document.getElementById("checklist-button");
+    let dateButton = document.getElementById("date-button");
+    console.log("test ", noteButton)
+    switch (select) {
+        case ("note"):
+            noteButton.className = "type-button selected";
+            form.id = "note-form"
+            break;
+        case ("checklist"):
+            checklistButton.className = "type-button selected";
+            form.id = "checklist-form";
+            break;
+        case ("date"):
+            dateButton.className = "type-button selected";
+            form.id = "date-form";
+            break;
+    }
 }
 function createTaskSubmitButton() {
     const buttonObj = new Element({tag: "button", id: "submit", text: "Create"});
@@ -123,34 +145,57 @@ function errorCheck([...items]) {
     })
     return result.every((item) => item === true)
 }
-function displayProjectForm() {
+function displayProjectForm(action) {
     buttonWrapper.replaceChildren("");
     form.id = "project-form";
     form.method = "dialog";
     form.replaceChildren("")
 
     const projNameLabel = new Label({forLink: "proj-title-input", id: "proj-title-label", name: "proj-title-label", text: "Name of Project"}).create()
-    const projNameObj = new Input({type: "text", id: "project-title-input", classes: "proj-form-el", name: "proj-title"})
+    const projNameObj = new Input({type: "text", id: "proj-title-input", classes: "proj-form-el", name: "proj-title"})
     const projName = projNameObj.create()
     projName.setAttribute("autocomplete", "off")
-    form.append(projNameLabel, projName, createProjectSubmitButton())
+    if (action==="edit") {
+        projName.value = projectsList[currentProjectIndex].name
+    }
+    form.append(projNameLabel, projName, createProjectSubmitButton(action))
 }
 
-function createProjectSubmitButton() {
+function createProjectSubmitButton(action) {
     const buttonObj = new Element({tag: "button", id: "submit", text: "Create"});
     const button = buttonObj.create();
-    button.addEventListener("click", (e) => {
-        e.preventDefault()
-        let name = form["proj-title"].value;
-        if (!name) return;
-        addProject(name)
-        updateProjectList()
-        modalWindow.close()
-    })
+    console.log(form)
+    if (action==="create") {
+        button.addEventListener("click", (e) => {
+            let name = form["proj-title"].value;
+            e.preventDefault()
+            if (!name) return;
+            addProject(name)
+            updateProjectList()
+            modalWindow.close()
+        })
+    }
+    if (action==="edit") {
+        button.textContent = "Change"
+        button.addEventListener("click", (e) => {
+            e.preventDefault()
+            let name = form["proj-title"].value;
+            if (!name) return;
+            projectsList[currentProjectIndex].name = form["proj-title"].value;
+            updateLocalStorage()
+            updateProjectList()
+            modalWindow.close()
+            console.log(form["proj-title"].value)
+        })
+    }
     return button
 }
 
-function displayTaskForm() {
+function getProperty(index, property) {
+    const taskProperty = projectsList[currentProjectIndex].taskList[index][property]
+    return taskProperty
+}
+function displayTaskForm(action, index) {
     form.replaceChildren("");
     form.method = "dialog";
     form.id = `${select}-form`;
@@ -161,10 +206,15 @@ function displayTaskForm() {
     const titleLabel = titleLabelObj.create()
     const titleInputObj = new Input({type: "text", name: "title", id: "title-input", classes: "task-form-el", required: true});
     const titleInput = titleInputObj.create();
-    inputWrapper.replaceChildren(titleLabel, titleInput, buildDescription(), buildDue(), buildPrioritySlider(), createTaskSubmitButton())
+
+    if (action==="edit") {
+        titleInput.value = getProperty(index, "title");
+    }
+
+    inputWrapper.replaceChildren(titleLabel, titleInput, buildDescription(action, index), buildDue(action, index), buildPrioritySlider(action,index), createTaskSubmitButton(action, index))
     form.append(inputWrapper)
 }
-function buildDescription() {
+function buildDescription(action, index) {
     const descriptionDiv = new Element({tag: "div", classes: "description-div"}).create();
     const checklistItems = new Element({tag: "div", classes: "checklist-items"}).create();
     checklistItems.name = "checklist-items-wrapper";
@@ -192,13 +242,16 @@ function buildDescription() {
         const descriptionLabel = descriptionLabelObj.create();
         const descriptionInputObj = new Element({tag: "textarea", id: "description-input", classes: "task-form-el"});
         const descriptionInput = descriptionInputObj.create();
-        descriptionInput.name= "description";
+        descriptionInput.name="description";
+        if (action === "edit") {
+            descriptionInput.value = getProperty(index, "description")
+        }
         descriptionDiv.append(descriptionLabel, descriptionInput)
     }
 
     return descriptionDiv;
 }
-function buildDue() {
+function buildDue(action, index) {
     const dueWrapper = new Element({tag: "div", id: "due-wrapper"}).create();
 
     const dueDateLabelObj = new Label(
@@ -214,12 +267,15 @@ function buildDue() {
     const dueTimeLabel = dueTimeLabelObj.create();
     const dueTimeObj = new Input({type: "time", id: "due-time-input", name: "due-time-input", classes: "task-form-el"});
     const dueTime = dueTimeObj.create();
-
+    if (action === "edit") {
+        dueDate.value = getProperty(index, "dueDate")
+        dueTime.value = getProperty(index, "dueTime")
+    }
     dueWrapper.append(dueDateLabel, dueDate, dueTime);
     return dueWrapper;
 }
 let currentPriority;
-function buildPrioritySlider() {
+function buildPrioritySlider(action, index) {
     currentPriority = undefined;
     const priorityAndTimerWrapper = new Element({tag: "div", id: "priority-wrapper"}).create()
     const priorityLabelObj = new Label({id: "priority-label", forLink: "priority-list", text: "Priority"})
@@ -233,7 +289,6 @@ function buildPrioritySlider() {
     priority.setAttribute("value", "0");
     const priorityMarkers = new Element({tag: "datalist", id: "priority-markers"}).create();
     const priorityMarkerLabels = new Element({tag: "div", id: "priority-marker-labels"}).create()
-    console.log(currentPriority)
     priority.addEventListener("change", (e) => {
         switch (e.target.value) {
             case ("0"):
@@ -252,13 +307,13 @@ function buildPrioritySlider() {
     })
 
     const priorities = ["None", "Low", "Medium", "High"];
-    priorities.forEach((item, index) => {
+    priorities.forEach((item, itemIndex) => {
         const priorityOption = new Element({tag: "option", class: "priority-option"}).create();
-        priorityOption.value = index;
+        priorityOption.value = itemIndex;
         priorityOption.label = item;
 
         const priorityOptionLabel = new Element({tag: "span", class: "priority-option-label", text: item}).create()
-
+        
         priorityMarkers.append(priorityOption)
         priorityMarkerLabels.append(priorityOptionLabel)
     })
@@ -269,6 +324,25 @@ function buildPrioritySlider() {
     const timerCheck = timerCheckObj.create();
     console.log("timerCheck ", timerCheck)
 
+    if (action === "edit") {
+        let sliderValue;
+        switch (getProperty(index, "priority")) {
+            case ("None"):
+                sliderValue = "0";
+                break;
+            case ("Low"):
+                sliderValue = "1";
+                break;
+            case ("Medium"):
+                sliderValue = "2";
+                break;
+            case ("High"):
+                sliderValue = "3";
+                break;
+        }
+        priority.value = sliderValue;
+        timerCheck.value = getProperty(index, "timer")
+    }
     priorityAndTimerWrapper.append(priorityLabel, priority, priorityMarkers, priorityMarkerLabels, timerCheckLabel, timerCheck);
     return priorityAndTimerWrapper;
 }

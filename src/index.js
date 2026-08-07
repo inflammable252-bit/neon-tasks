@@ -61,7 +61,7 @@ function updateProjectList() {
             updateTaskList()
             addCardsToDesk(currentProjectIndex)
         })
-        li.append(addDeleteButton("project"), project)
+        li.append(addDeleteButton("project"), project, addEditButton("project"))
         list.append(li);
     })
     const buttonObj = new Element({tag: "button", id: "create-project", text: "Create Project"})
@@ -80,7 +80,7 @@ function updateTaskList() {
         const li = liObj.create();
         li.tabIndex = 0;
         const task = new Element({tag: "p", classes: "task-item-text", text: item.title}).create();
-        li.append(addDeleteButton("task"), task);
+        li.append(addDeleteButton("task"), task, addEditButton("task"));
         list.append(li)
     })
     const buttonObj = new Element({tag: "button", id: "create-task", text: "Create Task"});
@@ -110,28 +110,45 @@ let activeIndexToDelete;
 function addDeleteButton(fromList) {
     const deleteButton = new Image({classes: `delete-icon delete-${fromList}`, src: closeIcon, alt: "Delete task"}).create();
     deleteButton.addEventListener("click", (e) => {
-        let ulParent = e.target.parentElement.parentElement.parentElement;
-        ulParent.id === "tasks-list" ? projectOrTask = "task" : projectOrTask = "project";
-        let liItems = (e.target.parentElement).parentElement.children;
-        let liItemsArr = Array.from(liItems);
-        activeIndexToDelete = liItemsArr.indexOf(e.target.parentElement)
-        console.log("projectOrTask swapped to ", projectOrTask)
+        getIndex(e)
         displayModal(e)
     })
     return deleteButton
 }
-function displayModal(e) {
+function addEditButton(fromList) {
+    const editButton = new Element({tag: "button", classes: `edit-item edit-${fromList}`, text: "Edit"}).create();
+    editButton.addEventListener("click", (e) => {
+        console.log(e)
+        e.preventDefault()
+        getIndex(e)
+        displayModal(e, activeIndexToDelete)
+    })
+    return editButton
+}
+function getIndex(e) {
+    let ulParent = e.target.parentElement.parentElement.parentElement;
+        ulParent.id === "tasks-list" ? projectOrTask = "task" : projectOrTask = "project";
+        let liItems = (e.target.parentElement).parentElement.children;
+        let liItemsArr = Array.from(liItems);
+        activeIndexToDelete = liItemsArr.indexOf(e.target.parentElement)
+}
+function displayModal(e, index) {
     modalOn("on");
     const closeButton = document.getElementById("close-modal");
     closeButton.addEventListener("click", (e) =>
     modalOn("off"))
     if (e.target.id==="create-task" || e.target.id ==="add-icon") {
-        createButtons()
-        displayTaskForm()
+        createButtons("create")
+        displayTaskForm("create")
     }
-    if (e.target.id==="create-project") displayProjectForm();
+    if (e.target.id==="create-project") displayProjectForm("create");
     if (e.target.classList.contains("delete-icon")) displayDelete();
     if (e.target.id==="backup") displayBackup()
+    if (e.target.classList.contains("edit-project"))displayProjectForm("edit")
+    if (e.target.classList.contains("edit-task")) {
+        createButtons("edit")
+        displayTaskForm("edit", index)
+    }
 }
 const addIcon = document.getElementById("add-icon");
 addIcon.addEventListener("click", (e) => {
@@ -168,6 +185,14 @@ function deleteActiveProject() {
     addCardsToDesk(currentProjectIndex)
     updateLocalStorage()
 }
+function updateActiveTask(target) {
+    const selectedTask = projectsList[currentProjectIndex].projectList[index];
+    const selectedCard = cards[index];
+
+    selectedTask.update(task)
+    selectedCard.replaceWith(selectedTask.createCard())
+}
+
 function addTask(projectIndex, task) {
     projectsList[projectIndex].addTaskToList(task)
 }
