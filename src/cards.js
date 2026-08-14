@@ -83,12 +83,12 @@ function createCardTimeDiv(task, card) {
             timeSection.append(deadlineHead, dueDateEle)
         }
     }
-    if (task.priority) {
+    if (task.priority && task.priority !== "None") {
         const priorityObj = new Element({tag: "p", classes: "card-priority", text: "Priority: " + task.priority});
         const priority = priorityObj.create();
         timeSection.append(priority)
     }
-    if (task.timer==="on") {
+    if (task.timer && task.timer !== "off") {
         let dueInfo = getDue(task);
         const timerEleObj = new Element({tag: "p", classes: "card-timer", text: dueInfo.getMsg()});
         const timerEle = timerEleObj.create();
@@ -134,7 +134,8 @@ function getDue(task) {
 // Card drag adapted from:
 // https://srivastavayushmaan1347.medium.com/blog-title-creating-a-draggable-div-element-with-javascript-88f3be51bbf9
 
-function addDrag(container) {
+function addDrag() {
+const container = document.getElementById("card-wrapper");
 const cards = document.querySelectorAll(".card");
 const sidebar = document.getElementById("sidebar")
 const nav =  document.querySelector("nav");

@@ -144,7 +144,7 @@ function displayModal(e, index) {
     if (e.target.id==="create-project") displayProjectForm("create");
     if (e.target.classList.contains("delete-icon")) displayDelete();
     if (e.target.id==="backup") displayBackup()
-    if (e.target.classList.contains("edit-project"))displayProjectForm("edit")
+    if (e.target.classList.contains("edit-project")) displayProjectForm("edit")
     if (e.target.classList.contains("edit-task")) {
         createButtons("edit")
         displayTaskForm("edit", index)
@@ -212,7 +212,6 @@ function deleteTask(projectIndex, taskIndex) {
 }
 function deleteActiveTask() {
     deleteTask(currentProjectIndex, activeIndexToDelete)
-    console.log(activeIndexToDelete)
     updateTaskList()
     updateLocalStorage()
 }
@@ -238,7 +237,7 @@ function addCardsToDesk(projectIndex) {
         task.assignedIndex = counter;
         counter++
     }
-    addDrag(cardWrapper, autoSpread)    
+    addDrag()
 }
 function addCard() {
     const taskList = projectsList[currentProjectIndex].taskList
@@ -246,7 +245,6 @@ function addCard() {
     console.log(taskList)
     task.createCard();
     updateTimers()
-    if (drag) addDrag(cardWrapper, autoSpread);
 }
 function updateTimers() {
     clearInterval(currentTimer)

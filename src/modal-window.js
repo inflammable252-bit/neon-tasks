@@ -1,6 +1,7 @@
 export { createButtons, modalOn, displayTaskForm, displayProjectForm, displayDelete, zeroProjectError, displayBackup }
 import { projectsList, addProject, updateProjectList, deleteTask, updateTaskList, currentProjectIndex, addTask, addCardsToDesk, addCard, deleteActiveTask, deleteActiveProject, projectOrTask, activeIndexToDelete, removeEmptyItems } from "./index.js"
 import { Element, Image, Input, Label, Project, Note, ChecklistNote, updateLocalStorage } from "./components.js"
+import { addDrag, populateCard } from "./cards.js"
 
 const modalWindow = document.getElementById("modal-window");
 const buttonWrapper = document.getElementById("button-wrapper");
@@ -15,9 +16,11 @@ function modalOn(state) {
 function createButtons(action) {
     buttonSource = action;
     const typeOfNote = projectsList[currentProjectIndex].taskList[activeIndexToDelete]?.type;
-    console.log("creating buttons, action: ", action)
     select = typeOfNote ?? "note";
-    console.log("type of note", typeOfNote)
+    console.log("Creating buttons", {
+        action: action,
+        select: select,
+    })
     let noteButton = new Element({tag: "button", id: "note-button", classes: "type-button", text: "Note"}).create();
     let checklistButton = new Element({tag: "button", id: "checklist-button", classes: "type-button", text: "Checklist"}).create();
     let dateButton = new Element({tag: "button", id: "date-button", classes: "type-button", text: "Date"}).create();
@@ -29,7 +32,6 @@ function createButtons(action) {
     else noteButton.className = "type-button selected"
 }
 function buttonSwap(e) {
-        console.log("action in listener", buttonSource)
         if (buttonSource === "edit") {
             console.log("edit, returning")
             return
@@ -56,7 +58,6 @@ function selectForm(select) {
     let noteButton = document.getElementById("note-button");
     let checklistButton = document.getElementById("checklist-button");
     let dateButton = document.getElementById("date-button");
-    console.log("test ", noteButton)
     switch (select) {
         case ("note"):
             noteButton.className = "type-button selected";
@@ -72,9 +73,25 @@ function selectForm(select) {
             break;
     }
 }
-function createTaskSubmitButton() {
+function taskSet(index) {
+    let currentList = projectsList[currentProjectIndex].taskList;
+    let currentTask = currentList[index];
+    let currentIndex = Array.from(currentList).indexOf(currentTask)
+    let currentCards = document.querySelectorAll("article.card");
+    let currentCard = currentCards[currentIndex];
+
+    return { currentList, currentTask, currentIndex, currentCards, currentCard }
+}
+function createTaskSubmitButton(action, index) {
+    let taskDescription;
+    let task = taskSet(index);
+    console.log("Editing ", task.currentTask)
+
     const buttonObj = new Element({tag: "button", id: "submit", text: "Create"});
     const button = buttonObj.create();
+    if (action==="edit") {
+        button.textContent = "Update"
+    }
     button.addEventListener("click", (e) => {
         e.preventDefault();
         const noteFields = [form.title, form.description];
@@ -92,47 +109,75 @@ function createTaskSubmitButton() {
                 checkFields = checklistFields;
                 break;
         }
-        if (!errorCheck(checkFields)) return;
-        const checklistItems = document.querySelectorAll("dialog p.card-checklist-item");
-        console.log("check ", checklistItems)
-        if ((select==="checklist") && checklistItems.length === 0) {
+        if (action === "create" && !errorCheck(checkFields, action)) return;
+        
+        if (action === "create" && (select==="checklist") && checklistItems.length === 0) {
             form.description.style.border = "2px solid rgba(255, 0, 0, 0.61)";
             return
         }
-        let taskDescription;
         if (select==="checklist") {
-            taskDescription = [];
-            checklistItems.forEach((item) => {
-                taskDescription.push(item.textContent)
-            })
+            if (action==="edit") {
+                let itemInputs = document.querySelectorAll(".checklist-items input");
+                taskDescription = [];
+                itemInputs.forEach((item) => {
+                    if (item) taskDescription.push(item.value)
+                })
+            }
+            else {
+                let checklistItems = document.querySelectorAll("dialog p.card-checklist-item");
+                taskDescription = [];
+                checklistItems.forEach((item) => {
+                    taskDescription.push(item.textContent)
+                })
+            }
         }
         else {
             taskDescription = form.description.value
         }
         let timerCheck;
         if (select==="date") {
-            ((form["timer"].checked) && (timerCheck = "on"));
+            form["timer"].checked ? timerCheck = "on" : timerCheck="off";
         }
-        addTask(currentProjectIndex, {
-            title: form.title.value, 
-            description: taskDescription, 
-            dueDate: form["due-date-input"]?.value,
-            dueTime: form["due-time-input"]?.value,
-            priority: currentPriority,
-            timer: timerCheck || undefined,
-            type: select,
-        })
-        addCard()
-        updateProjectList()
+        if (action==="edit") {
+            task.currentTask.update({
+                title: form.title.value, 
+                description: taskDescription, 
+                dueDate: form["due-date-input"]?.value,
+                dueTime: form["due-time-input"]?.value,
+                priority: currentPriority,
+                timer: timerCheck,
+                type: select,
+            })
+            task.currentCard.replaceChildren("")
+            populateCard(task.currentTask, task.currentCard)
+            console.log("Task updated: ", task.currentTask)
+        } 
+        else {
+            addTask(currentProjectIndex, {
+                title: form.title.value, 
+                description: taskDescription, 
+                dueDate: form["due-date-input"]?.value,
+                dueTime: form["due-time-input"]?.value,
+                priority: currentPriority,
+                timer: timerCheck,
+                type: select,
+            })
+            addCard()
+            form.reset()
+        }
         updateTaskList()
-        form.reset()
+        updateProjectList()
         modalWindow.close()
     })
     return button;
 }
-function errorCheck([...items]) {
+function errorCheck([...items], action) {
     const color = "2px solid rgba(255, 0, 0, 0.61)";
     const result = [];
+    if (action === "edit") {
+        result.push(true);
+        return
+    }
     items.forEach((item) => {
         if (!item.value) {
             item.style.border = color;
@@ -164,7 +209,6 @@ function displayProjectForm(action) {
 function createProjectSubmitButton(action) {
     const buttonObj = new Element({tag: "button", id: "submit", text: "Create"});
     const button = buttonObj.create();
-    console.log(form)
     if (action==="create") {
         button.addEventListener("click", (e) => {
             let name = form["proj-title"].value;
@@ -185,7 +229,7 @@ function createProjectSubmitButton(action) {
             updateLocalStorage()
             updateProjectList()
             modalWindow.close()
-            console.log(form["proj-title"].value)
+            // console.log(form["proj-title"].value)
         })
     }
     return button
@@ -196,6 +240,7 @@ function getProperty(index, property) {
     return taskProperty
 }
 function displayTaskForm(action, index) {
+    if (action==="create") select="note"
     form.replaceChildren("");
     form.method = "dialog";
     form.id = `${select}-form`;
@@ -211,20 +256,22 @@ function displayTaskForm(action, index) {
         titleInput.value = getProperty(index, "title");
     }
 
-    inputWrapper.replaceChildren(titleLabel, titleInput, buildDescription(action, index), buildDue(action, index), buildPrioritySlider(action,index), createTaskSubmitButton(action, index))
+    inputWrapper.replaceChildren(titleLabel, titleInput, buildDescription(action, index), buildDue(action, index), buildPrioritySlider(action, index), createTaskSubmitButton(action, index))
     form.append(inputWrapper)
 }
 function buildDescription(action, index) {
     const descriptionDiv = new Element({tag: "div", classes: "description-div"}).create();
-    const checklistItems = new Element({tag: "div", classes: "checklist-items"}).create();
-    checklistItems.name = "checklist-items-wrapper";
     if (form.id==="checklist-form") {
         const descriptionLabel = new Label(
         {forLink: "description-input", id: "description-label", name: "description-label", text: "Checklist Items"}).create();
+        const checklistItems = new Element({tag: "div", classes: "checklist-items"}).create();
+        checklistItems.name = "checklist-items-wrapper";
         const descriptionInput = new Input({id: "description-input", classes: "task-form-el", type: "text", name: "list-item-input"}).create();
         const addItem = new Element({tag: "button", classes: "checklist-add-item", text: "Add item"}).create();
         descriptionInput.name= "description";
-        
+        const addEditItem = new Element({tag: "button", classes: "checklist-add-item", text: "Add item"}).create();
+        descriptionInput.name= "description";
+            
         addItem.addEventListener("click", (e) => {
             e.preventDefault();
             if (!descriptionInput.value) return;
@@ -232,9 +279,30 @@ function buildDescription(action, index) {
             checklistItems.append(item);
             descriptionInput.value = "";
         })
-        
-        const descriptionInputDiv = new Element({tag: "div", classes: "checklist-input-div"}).create()
-        descriptionDiv.append(descriptionLabel, checklistItems, descriptionInput, addItem)
+    
+        if (action==="edit") {
+            descriptionDiv.append(descriptionLabel)
+            getProperty(index, "description").forEach((listItem) => {
+                const descriptionInputEdit = new Input({classes: "task-form-el", type: "text", name: "list-item-input"}).create();
+                descriptionInputEdit.value = listItem;
+                checklistItems.append(descriptionInputEdit)
+            })
+            addEditItem.addEventListener("click", (e) => {
+                e.preventDefault();
+
+                const descriptionInputEdit = new Input({classes: "task-form-el", type: "text", name: "list-item-input"}).create();
+                const descriptionInputEdits = document.querySelectorAll(".description-div input");
+                const listItemLast = descriptionInputEdits[descriptionInputEdits.length-1];
+                
+                if (!listItemLast.value) return;
+                const newItem = new Input({classes: "task-form-el", type: "text", name: "list-item-input"}).create();
+                newItem.value = listItemLast.value;
+                checklistItems.append(newItem);
+                listItemLast.value = "";
+            })
+            descriptionDiv.append(checklistItems, descriptionInput, addEditItem)
+        }
+        else descriptionDiv.append(descriptionLabel, checklistItems, descriptionInput, addItem)
     }
     else {
         const descriptionLabelObj = new Label(
@@ -274,9 +342,8 @@ function buildDue(action, index) {
     dueWrapper.append(dueDateLabel, dueDate, dueTime);
     return dueWrapper;
 }
-let currentPriority;
+let currentPriority = undefined;
 function buildPrioritySlider(action, index) {
-    currentPriority = undefined;
     const priorityAndTimerWrapper = new Element({tag: "div", id: "priority-wrapper"}).create()
     const priorityLabelObj = new Label({id: "priority-label", forLink: "priority-list", text: "Priority"})
     const priorityLabel = priorityLabelObj.create();
@@ -292,7 +359,7 @@ function buildPrioritySlider(action, index) {
     priority.addEventListener("change", (e) => {
         switch (e.target.value) {
             case ("0"):
-                currentPriority = "";
+                currentPriority = "None";
                 break;
             case ("1"):
                 currentPriority = "Low";
@@ -304,6 +371,7 @@ function buildPrioritySlider(action, index) {
                 currentPriority = "High";
                 break;
         }
+        console.log("Priority changed to ", currentPriority)
     })
 
     const priorities = ["None", "Low", "Medium", "High"];
@@ -322,7 +390,6 @@ function buildPrioritySlider(action, index) {
     const timerCheckLabel = timerCheckLabelObj.create();
     const timerCheckObj = new Input({type: "checkbox", name: "timer", id: "timer-check", value: "on"});
     const timerCheck = timerCheckObj.create();
-    console.log("timerCheck ", timerCheck)
 
     if (action === "edit") {
         let sliderValue;
@@ -340,8 +407,11 @@ function buildPrioritySlider(action, index) {
                 sliderValue = "3";
                 break;
         }
+        console.log("priority ", getProperty(index, "priority"))
         priority.value = sliderValue;
-        timerCheck.value = getProperty(index, "timer")
+        if (getProperty(index, "timer") === "on") {
+            timerCheck.setAttribute("checked", "")
+        }
     }
     priorityAndTimerWrapper.append(priorityLabel, priority, priorityMarkers, priorityMarkerLabels, timerCheckLabel, timerCheck);
     return priorityAndTimerWrapper;
