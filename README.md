@@ -35,14 +35,15 @@ A backup feature can be accessed through a button in the sidebar. A string is ge
 ![Personal task examples](./ss2.png)
 ![Welcome screen](./ss3.png)
 
-## Possible Features
+## Future considerations and Possible Features
+- Major refactor to separate CRUD task functions and card builder functions
 - More card types
 - Card categories/tagging
 - Alternative layout for mobile, as the card structure currently does not work well for smaller viewports
 - Other modules, ex. stopwatch/Pomodoro timer
 - Maintain card positions on reload
 - Card resizing
-- Modal window to edit a selected card
+- ~~Modal window to edit a selected card~~ Card editing added
 - Smoother drag behavior
 - Buttons to sort cards into different arrangements
 
